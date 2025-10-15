@@ -1,26 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-brand-1: hsla(356, 46.7%, 94.1%, 1);
+  --color-brand-2: hsla(358, 45.2%, 85.7%, 1);
+  --color-brand-3: hsla(358, 44.6%, 74.5%, 1);
+  --color-brand-4: hsla(358, 44.5%, 62.5%, 1);
+  --color-brand-5: hsla(358, 44.6%, 51.2%, 1);
+  --color-brand-6: hsla(358, 65.2%, 40.6%, 1);
+  --color-brand-7: hsla(358, 64.8%, 34.5%, 1);
+  --color-brand-8: hsla(359, 64.6%, 28.8%, 1);
+  --color-brand-9: hsla(358, 64.4%, 23.1%, 1);
+  --color-brand-10: hsla(358, 64.7%, 10%, 1);
+
+  --text-h1: 3.81rem;
+  --text-h2: 3.06rem;
+  --text-h3: 2.44rem;
+  --text-h4: 1.94rem;
+  --text-h5: 1.56rem;
+  --text-h6: 1.25rem;
+  --text-body: 1rem;
+  --text-small: 0.81rem;
+  --text-caption: 0.62rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* TODO */
+/* font family inter */
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap"); */
+/* Test on pixelify */
