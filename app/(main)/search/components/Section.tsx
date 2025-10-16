@@ -4,7 +4,6 @@ function Section({
 }: Readonly<{
   children: React.ReactNode;
   sectionName: string;
-  labelKey?: string;
 }>) {
   return (
     <fieldset>

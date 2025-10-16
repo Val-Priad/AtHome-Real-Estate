@@ -26,6 +26,8 @@ import {
 } from "./components/options";
 import Section from "./components/Section";
 import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
+import FromToSection from "./components/FromToSection";
+import Button from "@/components/ui/Button";
 
 export interface SearchFormData {
   location?: string;
@@ -37,12 +39,12 @@ export interface SearchFormData {
   [key: string]: string | string[] | undefined;
 }
 
-type TPropertyType = "apartment" | "house";
+export type TPropertyType = "apartment" | "house" | null;
 
 function Page() {
   const params = useSearchParams();
-  const [propertyType, setPropertyType] = useState<TPropertyType | null>(
-    params.get("property-type") as TPropertyType | null,
+  const [propertyType, setPropertyType] = useState<TPropertyType>(
+    params.get("property-type") as TPropertyType,
   );
   const [formData, setFormData] = useState<SearchFormData>({});
 
@@ -101,25 +103,32 @@ function Page() {
         </h1>
 
         <Section sectionName="Property Type">
-          <div className="mt-2 flex rounded-md bg-red-100">
-            <button
-              onClick={() => handleTypeChange("apartment")}
-              className={`flex-1 cursor-pointer rounded-md transition-colors duration-400 ${propertyType == "apartment" ? "hover:bg-brand-5 bg-brand-5 shadow-brand-9/50 text-white shadow-md" : "text-brand-10 bg-red-100 hover:bg-white"}`}
-            >
-              Apartment
-            </button>
-            <button
-              onClick={() => handleTypeChange("house")}
-              className={`flex-1 cursor-pointer rounded-md transition-colors duration-400 ${propertyType == "house" ? "hover:bg-brand-5 bg-brand-5 shadow-brand-9/50 text-white shadow-md" : "text-brand-10 bg-red-100 hover:bg-white"}`}
-            >
-              House
-            </button>
+          <div className="space-y-2">
+            <div className="mt-2 flex rounded-md bg-red-100">
+              <Button
+                type="search-checkbox-btn"
+                onClick={() => handleTypeChange("apartment")}
+                forPropertyType={"apartment"}
+                curPropertyType={propertyType}
+              >
+                Apartment
+              </Button>
+              <Button
+                type="search-checkbox-btn"
+                forPropertyType={"house"}
+                curPropertyType={propertyType}
+                onClick={() => handleTypeChange("house")}
+              >
+                House
+              </Button>
+            </div>
+
+            {!propertyType && (
+              <p className="text-small text-center text-stone-500">
+                * Property type not specified: searching for all property types.
+              </p>
+            )}
           </div>
-          {!propertyType && (
-            <p className="text-small text-center text-stone-500">
-              * Property type not specified: searching for all property types.
-            </p>
-          )}
         </Section>
 
         <SectionWithCheckboxes
@@ -154,6 +163,33 @@ function Page() {
             />{" "}
           </>
         )}
+
+        {propertyType === "apartment" && (
+          <FromToSection
+            handleInputChange={handleInputChange}
+            sectionName="Floor"
+          />
+        )}
+
+        {propertyType === "house" && (
+          <FromToSection
+            handleInputChange={handleInputChange}
+            sectionName="Land Area"
+            isArea={true}
+          />
+        )}
+
+        <FromToSection
+          handleInputChange={handleInputChange}
+          sectionName="Usable Area"
+          isArea={true}
+        />
+
+        <FromToSection
+          handleInputChange={handleInputChange}
+          sectionName="Price"
+          currency="$"
+        />
 
         <SectionWithCheckboxes
           sectionName={CONDITION}

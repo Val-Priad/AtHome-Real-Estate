@@ -26,7 +26,7 @@ function SectionWithCheckboxes({
             <label key={value} className="flex items-center space-x-2 text-sm">
               <input
                 type="checkbox"
-                name={fieldName as string}
+                name={fieldName}
                 value={value}
                 checked={isChecked(fieldName, value)}
                 onChange={handleInputChange}
