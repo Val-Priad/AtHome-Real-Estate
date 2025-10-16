@@ -23,11 +23,15 @@ import {
   HOUSE_ACCESSORY_OPTIONS,
   BUILDING_MATERIAL,
   BUILDING_MATERIAL_OPTIONS,
+  VICINITY_OPTIONS,
+  REGIONS_OPTIONS,
+  DISTANCE_TO_FACILITIES,
 } from "./components/options";
 import Section from "./components/Section";
 import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
 import FromToSection from "./components/FromToSection";
 import Button from "@/components/ui/Button";
+import SectionWithDropdown from "./components/SectionWithDropdown";
 
 export interface SearchFormData {
   location?: string;
@@ -87,6 +91,13 @@ function Page() {
     });
   }, []);
 
+  const handleSelectChange = useCallback(
+    (e: ChangeEvent<HTMLSelectElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    [],
+  );
   function isChecked(name: keyof SearchFormData, value: string) {
     const field = formData[name];
     return Array.isArray(field) && field.includes(value);
@@ -130,6 +141,12 @@ function Page() {
             )}
           </div>
         </Section>
+
+        <SectionWithDropdown
+          sectionName="Region"
+          options={REGIONS_OPTIONS}
+          handleSelectChange={handleSelectChange}
+        />
 
         <SectionWithCheckboxes
           sectionName={OFFER_TYPE}
@@ -224,6 +241,12 @@ function Page() {
             isChecked={isChecked}
           />
         )}
+
+        <SectionWithDropdown
+          sectionName={DISTANCE_TO_FACILITIES}
+          options={VICINITY_OPTIONS}
+          handleSelectChange={handleSelectChange}
+        />
 
         <SectionWithCheckboxes
           sectionName={FEATURES_IN_THE_VICINITY}

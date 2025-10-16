@@ -56,7 +56,7 @@ function Block({
           type="text"
           onChange={handleInputChange}
           name={fieldName}
-          className="border-brand-6 focus:outline-brand-6 block w-15 rounded-lg border focus:outline focus:outline-offset-2"
+          className="border-brand-6 focus:outline-brand-6 block w-15 rounded-lg border pl-1.5 focus:outline focus:outline-offset-2"
         />
 
         {isArea && (
