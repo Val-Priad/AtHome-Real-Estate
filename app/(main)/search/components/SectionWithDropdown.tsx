@@ -19,7 +19,9 @@ function SectionWithDropdown({
         id={toCamelCase(sectionName + " Select")}
         onChange={handleSelectChange}
       >
-        <option value={toCamelCase("no " + sectionName)}>--Select-- </option>
+        <option key={-1} value={toCamelCase("no " + sectionName)}>
+          --Select--
+        </option>
         {options.map((option) => {
           if (typeof option === "string") {
             return (

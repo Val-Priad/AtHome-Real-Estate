@@ -1,5 +1,6 @@
 "use client";
 
+import { HiMiniMagnifyingGlass } from "react-icons/hi2";
 import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, useCallback, useState } from "react";
 import {
@@ -24,14 +25,19 @@ import {
   BUILDING_MATERIAL,
   BUILDING_MATERIAL_OPTIONS,
   VICINITY_OPTIONS,
-  REGIONS_OPTIONS,
+  REGION_OPTIONS,
   DISTANCE_TO_FACILITIES,
+  REGION,
+  toCamelCase,
+  SMART_SEARCH,
 } from "./components/options";
 import Section from "./components/Section";
 import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
 import FromToSection from "./components/FromToSection";
 import Button from "@/components/ui/Button";
 import SectionWithDropdown from "./components/SectionWithDropdown";
+import Map from "./components/Map";
+import SectionWithTextarea from "./components/SectionWithTextarea";
 
 export interface SearchFormData {
   location?: string;
@@ -51,6 +57,8 @@ function Page() {
     params.get("property-type") as TPropertyType,
   );
   const [formData, setFormData] = useState<SearchFormData>({});
+
+  const selectedRegions = formData[toCamelCase(REGION)] as string[] | undefined;
 
   function handleTypeChange(newType: TPropertyType) {
     setPropertyType((prev) => (newType === prev ? null : newType));
@@ -73,7 +81,7 @@ function Page() {
         if (checked) {
           return {
             ...prev,
-            [name]: Array.from(new Set([...currentValue, value])),
+            [name]: [...currentValue, value],
           };
         } else {
           const newValues = currentValue.filter((v) => v !== value);
@@ -98,20 +106,54 @@ function Page() {
     },
     [],
   );
+
+  const handleMapChange = useCallback((regionTitle: string) => {
+    const name = toCamelCase(REGION);
+    setFormData((prev) => {
+      const currentValue = (prev[name] as string[]) || [];
+      if (currentValue.length === 0) {
+        return { ...prev, [name]: [regionTitle] };
+      }
+
+      if (currentValue.includes(regionTitle)) {
+        const newValues = currentValue.filter((value) => value !== regionTitle);
+        return {
+          ...prev,
+          [name]: newValues.length > 0 ? newValues : undefined,
+        };
+      }
+
+      return { ...prev, [name]: [...currentValue, regionTitle] };
+    });
+  }, []);
+
+  const handleTextareaChange = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    [],
+  );
+
   function isChecked(name: keyof SearchFormData, value: string) {
     const field = formData[name];
     return Array.isArray(field) && field.includes(value);
   }
 
   return (
-    <main className="flex justify-center">
+    <main className="flex justify-center px-2">
       <form
-        className="border-brand-6 w-full rounded-t-2xl border border-b-0 bg-stone-100 px-4 py-4"
+        className="border-brand-6 relative max-w-228 rounded-t-2xl border border-b-0 bg-stone-100 px-4 py-4"
         onSubmit={handleSubmit}
       >
         <h1 className="text-brand-10 text-h5 mb-7.5 text-center">
           Property Search Filters
         </h1>
+
+        <Map
+          handleMapChange={handleMapChange}
+          selectedRegions={selectedRegions}
+        />
 
         <Section sectionName="Property Type">
           <div className="space-y-2">
@@ -142,10 +184,11 @@ function Page() {
           </div>
         </Section>
 
-        <SectionWithDropdown
-          sectionName="Region"
-          options={REGIONS_OPTIONS}
-          handleSelectChange={handleSelectChange}
+        <SectionWithCheckboxes
+          sectionName={REGION}
+          handleInputChange={handleInputChange}
+          isChecked={isChecked}
+          options={REGION_OPTIONS}
         />
 
         <SectionWithCheckboxes
@@ -185,6 +228,7 @@ function Page() {
           <FromToSection
             handleInputChange={handleInputChange}
             sectionName="Floor"
+            formData={formData}
           />
         )}
 
@@ -193,6 +237,7 @@ function Page() {
             handleInputChange={handleInputChange}
             sectionName="Land Area"
             isArea={true}
+            formData={formData}
           />
         )}
 
@@ -200,12 +245,14 @@ function Page() {
           handleInputChange={handleInputChange}
           sectionName="Usable Area"
           isArea={true}
+          formData={formData}
         />
 
         <FromToSection
           handleInputChange={handleInputChange}
           sectionName="Price"
           currency="$"
+          formData={formData}
         />
 
         <SectionWithCheckboxes
@@ -261,6 +308,25 @@ function Page() {
           isChecked={isChecked}
           options={ENERGY_CLASS_OPTIONS}
         />
+
+        <SectionWithTextarea
+          sectionName={SMART_SEARCH}
+          handleTextareaChange={handleTextareaChange}
+        />
+
+        <div className="flex w-full justify-between gap-4">
+          <button
+            onClick={() => handleTypeChange(propertyType)}
+            className="border-brand-6 hover:border-brand-7 text-brand-10 my-8 w-full cursor-pointer rounded-lg border py-1 transition-colors"
+          >
+            Clear
+          </button>
+
+          <button className="bg-brand-6 hover:bg-brand-7 my-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-1 text-stone-100 transition-colors">
+            <span>See N results</span>
+            <HiMiniMagnifyingGlass />
+          </button>
+        </div>
       </form>
     </main>
   );

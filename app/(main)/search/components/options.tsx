@@ -3,6 +3,7 @@ export interface CheckboxOption {
   label?: string;
 }
 
+// MULTI CHOICE
 export const FLOOR_PLAN = "Floor Plan";
 export const FEATURES_IN_THE_VICINITY = "Near the Apartments";
 export const CONDITION = "Condition";
@@ -12,9 +13,11 @@ export const OFFER_TYPE = "Offer Type";
 export const HOUSE_CATEGORY = "House Category";
 export const HOUSE_SIZE = "House Size";
 export const BUILDING_MATERIAL = "Building Material";
-
-export const DISTANCE_TO_FACILITIES = "Distance to Facilities";
 export const REGION = "Region";
+
+// SINGLE CHOICE
+export const DISTANCE_TO_FACILITIES = "Distance to Facilities";
+export const SMART_SEARCH = "Smart Search";
 
 export const ARRAY_FIELDS: string[] = [
   // APARTMENTS ARRAY FIELDS
@@ -27,6 +30,7 @@ export const ARRAY_FIELDS: string[] = [
   HOUSE_CATEGORY,
   HOUSE_SIZE,
   BUILDING_MATERIAL,
+  REGION,
 ];
 
 export const CAMEL_ARRAY_FIELDS: string[] = ARRAY_FIELDS.map((value) =>
@@ -36,7 +40,7 @@ export const CAMEL_ARRAY_FIELDS: string[] = ARRAY_FIELDS.map((value) =>
 // BOTH APARTMENTS AND HOUSES
 export const OFFER_TYPE_OPTIONS = toOptions(["Sale", "Lease"]);
 
-export const REGIONS_OPTIONS = [
+export const REGION_OPTIONS = toOptions([
   "Vinnytsya region",
   "Volyn region",
   "Luhans'k region",
@@ -64,7 +68,7 @@ export const REGIONS_OPTIONS = [
   "Cherkasy region",
   "Chernihiv region",
   "Chernivtsi region",
-];
+]);
 
 export const VICINITY_OPTIONS: CheckboxOption[] = [
   { value: "0.5", label: "Up to a distance of 0.5 km" },
@@ -72,7 +76,7 @@ export const VICINITY_OPTIONS: CheckboxOption[] = [
   { value: "1.5", label: "Up to a distance of 1.5 km" },
   { value: "2", label: "Up to a distance of 2 km" },
   { value: "5", label: "Up to a distance of 5 km" },
-  { value: "1", label: "Up to a distance of 10 km" },
+  { value: "10", label: "Up to a distance of 10 km" },
 ];
 
 export const CONDITION_OPTIONS = toOptions([

@@ -7,11 +7,13 @@ function FromToSection({
   handleInputChange,
   isArea = false,
   currency = "",
+  formData,
 }: Readonly<{
   sectionName: string;
   handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isArea?: boolean;
   currency?: string;
+  formData: Record<string, string | string[] | undefined>;
 }>) {
   return (
     <Section sectionName={sectionName}>
@@ -22,6 +24,7 @@ function FromToSection({
           fieldLabel="From"
           handleInputChange={handleInputChange}
           currency={currency}
+          formData={formData}
         />
         <Block
           fieldName={toCamelCase(sectionName + " To")}
@@ -29,6 +32,7 @@ function FromToSection({
           fieldLabel="To"
           handleInputChange={handleInputChange}
           currency={currency}
+          formData={formData}
         />
       </div>
     </Section>
@@ -41,13 +45,21 @@ function Block({
   handleInputChange,
   isArea = false,
   currency = "",
+  formData,
 }: Readonly<{
   fieldLabel: string;
   fieldName: string;
   handleInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isArea?: boolean;
   currency: string;
+  formData: Record<string, string | string[] | undefined>;
 }>) {
+  const valueStoredInFormData = formData[fieldName];
+  const value =
+    typeof valueStoredInFormData === "string" &&
+    valueStoredInFormData.length > 0
+      ? valueStoredInFormData
+      : "";
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={fieldName}>{fieldLabel}</label>
@@ -57,6 +69,7 @@ function Block({
           onChange={handleInputChange}
           name={fieldName}
           className="border-brand-6 focus:outline-brand-6 block w-15 rounded-lg border pl-1.5 focus:outline focus:outline-offset-2"
+          value={value}
         />
 
         {isArea && (
