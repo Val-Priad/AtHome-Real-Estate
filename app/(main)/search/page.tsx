@@ -28,7 +28,7 @@ import {
   REGION_OPTIONS,
   DISTANCE_TO_FACILITIES,
   REGION,
-  toCamelCase,
+  toSnakeCase,
   SMART_SEARCH,
 } from "./components/options";
 import Section from "./components/Section";
@@ -38,6 +38,7 @@ import Button from "@/components/ui/Button";
 import SectionWithDropdown from "./components/SectionWithDropdown";
 import Map from "./components/Map";
 import SectionWithTextarea from "./components/SectionWithTextarea";
+import { useRouter } from "next/navigation";
 
 export interface SearchFormData {
   location?: string;
@@ -53,12 +54,13 @@ export type TPropertyType = "apartment" | "house" | null;
 
 function Page() {
   const params = useSearchParams();
+  const router = useRouter();
   const [propertyType, setPropertyType] = useState<TPropertyType>(
     params.get("property-type") as TPropertyType,
   );
   const [formData, setFormData] = useState<SearchFormData>({});
 
-  const selectedRegions = formData[toCamelCase(REGION)] as string[] | undefined;
+  const selectedRegions = formData[toSnakeCase(REGION)] as string[] | undefined;
 
   function handleTypeChange(newType: TPropertyType) {
     setPropertyType((prev) => (newType === prev ? null : newType));
@@ -108,7 +110,7 @@ function Page() {
   );
 
   const handleMapChange = useCallback((regionTitle: string) => {
-    const name = toCamelCase(REGION);
+    const name = toSnakeCase(REGION);
     setFormData((prev) => {
       const currentValue = (prev[name] as string[]) || [];
       if (currentValue.length === 0) {
@@ -138,6 +140,34 @@ function Page() {
   function isChecked(name: keyof SearchFormData, value: string) {
     const field = formData[name];
     return Array.isArray(field) && field.includes(value);
+  }
+
+  function buildQueryString(
+    formData: SearchFormData,
+    propertyType: TPropertyType,
+  ) {
+    const params = new URLSearchParams();
+
+    if (propertyType) {
+      params.set("property_type", propertyType);
+    }
+
+    Object.entries(formData).forEach(([key, value]) => {
+      if (!value) return;
+
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key, v));
+      } else {
+        params.set(key, value);
+      }
+    });
+
+    return params.toString();
+  }
+
+  function handleSearchClick() {
+    const queryString = buildQueryString(formData, propertyType);
+    router.push(`/search/results?${queryString}`);
   }
 
   return (
@@ -322,7 +352,10 @@ function Page() {
             Clear
           </button>
 
-          <button className="bg-brand-6 hover:bg-brand-7 my-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-1 text-stone-100 transition-colors">
+          <button
+            onClick={() => handleSearchClick()}
+            className="bg-brand-6 hover:bg-brand-7 my-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-1 text-stone-100 transition-colors"
+          >
             <span>See N results</span>
             <HiMiniMagnifyingGlass />
           </button>

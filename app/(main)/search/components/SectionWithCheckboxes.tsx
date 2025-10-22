@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 import { SearchFormData } from "../page";
-import { CheckboxOption, toCamelCase } from "./options";
+import { CheckboxOption, toSnakeCase } from "./options";
 import Section from "./Section";
 
 function SectionWithCheckboxes({
@@ -14,7 +14,7 @@ function SectionWithCheckboxes({
   isChecked: (fieldName: keyof SearchFormData, value: string) => boolean;
   options: CheckboxOption[];
 }>) {
-  const fieldName = toCamelCase(sectionName);
+  const fieldName = toSnakeCase(sectionName);
   return (
     <Section sectionName={sectionName}>
       <div className="flex flex-wrap gap-x-4">

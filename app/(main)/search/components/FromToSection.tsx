@@ -1,6 +1,6 @@
 import { ChangeEvent } from "react";
 import Section from "./Section";
-import { toCamelCase } from "./options";
+import { toSnakeCase } from "./options";
 
 function FromToSection({
   sectionName,
@@ -19,7 +19,7 @@ function FromToSection({
     <Section sectionName={sectionName}>
       <div className="flex gap-7">
         <Block
-          fieldName={toCamelCase(sectionName + " From")}
+          fieldName={toSnakeCase(sectionName + " From")}
           isArea={isArea}
           fieldLabel="From"
           handleInputChange={handleInputChange}
@@ -27,7 +27,7 @@ function FromToSection({
           formData={formData}
         />
         <Block
-          fieldName={toCamelCase(sectionName + " To")}
+          fieldName={toSnakeCase(sectionName + " To")}
           isArea={isArea}
           fieldLabel="To"
           handleInputChange={handleInputChange}

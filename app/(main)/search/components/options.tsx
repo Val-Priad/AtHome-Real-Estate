@@ -34,7 +34,7 @@ export const ARRAY_FIELDS: string[] = [
 ];
 
 export const CAMEL_ARRAY_FIELDS: string[] = ARRAY_FIELDS.map((value) =>
-  toCamelCase(value),
+  toSnakeCase(value),
 );
 
 // BOTH APARTMENTS AND HOUSES
@@ -186,23 +186,10 @@ function toOptions(values: string[]): CheckboxOption[] {
   return values.map((value) => ({ value }));
 }
 
-export function toCamelCase(str: string) {
-  if (!str || typeof str !== "string") {
-    return "";
-  }
-  const trimmedStr = str.trim();
-
-  return trimmedStr
-    .split(" ")
-    .map((word, index) => {
-      if (!word) {
-        return "";
-      }
-
-      if (index === 0) {
-        return word.toLowerCase();
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    })
-    .join("");
+export function toSnakeCase(str: string) {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w_]/g, "");
 }

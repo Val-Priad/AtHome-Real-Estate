@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { CheckboxOption, toCamelCase } from "./options";
+import { CheckboxOption, toSnakeCase } from "./options";
 import Section from "./Section";
 
 function SectionWithDropdown({
@@ -15,11 +15,11 @@ function SectionWithDropdown({
     <Section sectionName={sectionName}>
       <select
         className="block rounded-xl bg-white px-2 py-1"
-        name={toCamelCase(sectionName)}
-        id={toCamelCase(sectionName + " Select")}
+        name={toSnakeCase(sectionName)}
+        id={toSnakeCase(sectionName + " Select")}
         onChange={handleSelectChange}
       >
-        <option key={-1} value={toCamelCase("no " + sectionName)}>
+        <option key={-1} value={toSnakeCase("no " + sectionName)}>
           --Select--
         </option>
         {options.map((option) => {
