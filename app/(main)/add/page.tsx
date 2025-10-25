@@ -9,42 +9,43 @@ import {
   useEffect,
   useState,
 } from "react";
+
+import { useRouter } from "next/navigation";
 import {
+  ACCESSORIES,
+  APARTMENT_ACCESSORY_OPTIONS,
+  BUILDING_MATERIAL,
+  BUILDING_MATERIAL_OPTIONS,
   CAMEL_ARRAY_FIELDS,
-  VICINITY_FEATURE_OPTIONS,
+  CONDITION,
+  CONDITION_OPTIONS,
+  DISTANCE_TO_FACILITIES,
+  ENERGY_CLASS,
+  ENERGY_CLASS_OPTIONS,
   FEATURES_IN_THE_VICINITY,
   FLOOR_PLAN,
   FLOOR_PLAN_OPTIONS,
-  CONDITION,
-  CONDITION_OPTIONS,
-  APARTMENT_ACCESSORY_OPTIONS,
-  ACCESSORIES,
-  ENERGY_CLASS,
-  ENERGY_CLASS_OPTIONS,
-  OFFER_TYPE,
-  OFFER_TYPE_OPTIONS,
+  HOUSE_ACCESSORY_OPTIONS,
   HOUSE_CATEGORY,
   HOUSE_CATEGORY_OPTIONS,
   HOUSE_SIZE,
   HOUSE_SIZE_OPTIONS,
-  HOUSE_ACCESSORY_OPTIONS,
-  BUILDING_MATERIAL,
-  BUILDING_MATERIAL_OPTIONS,
-  VICINITY_OPTIONS,
-  REGION_OPTIONS,
-  DISTANCE_TO_FACILITIES,
+  OFFER_TYPE,
+  OFFER_TYPE_OPTIONS,
   REGION,
-  toSnakeCase,
+  REGION_OPTIONS,
   SMART_SEARCH,
-} from "./components/options";
-import Section from "./components/Section";
-import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
-import FromToSection from "./components/FromToSection";
+  toSnakeCase,
+  VICINITY_FEATURE_OPTIONS,
+  VICINITY_OPTIONS,
+} from "../search/components/options";
+import Map from "../search/components/Map";
+import Section from "../search/components/Section";
 import Button from "@/components/ui/Button";
-import SectionWithDropdown from "./components/SectionWithDropdown";
-import Map from "./components/Map";
-import SectionWithTextarea from "./components/SectionWithTextarea";
-import { useRouter } from "next/navigation";
+import SectionWithCheckboxes from "../search/components/SectionWithCheckboxes";
+import FromToSection from "../search/components/FromToSection";
+import SectionWithTextarea from "../search/components/SectionWithTextarea";
+import SectionWithDropdown from "../search/components/SectionWithDropdown";
 
 export interface SearchFormData {
   location?: string;
