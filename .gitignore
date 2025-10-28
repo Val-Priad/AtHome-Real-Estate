@@ -43,3 +43,6 @@ yarn-error.log*
 next-env.d.ts
 DB_Related/Thoughts.md
 DB_Related/Thoughts 2.md
+app/actions/bus_stops.ts
+db/scheme.sql
+db/Thoughts.md
