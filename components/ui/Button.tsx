@@ -1,4 +1,4 @@
-import { TPropertyType } from "@/app/(main)/search/page";
+import { TPropertyType } from "@/app/[lang]/(main)/search/page";
 
 function Button({
   children,

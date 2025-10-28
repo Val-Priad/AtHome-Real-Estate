@@ -1,0 +1,23 @@
+{
+  "home": {
+    "alt": {
+      "logo": "Company logo"
+    },
+    "subtitle": "Choose from 99,186 real estate offers",
+    "buttons": {
+      "apartments": "Apartments",
+      "houses": "Houses"
+    }
+  },
+  "nav": {
+    "alt": {
+      "logo": "At Home logo"
+    },
+    "links": {
+      "admin": "Admin",
+      "saved": "Saved",
+      "sell": "Sell With Us",
+      "login": "Log in"
+    }
+  }
+}

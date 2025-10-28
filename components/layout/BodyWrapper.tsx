@@ -1,4 +1,5 @@
 "use client";
+import bg from "../../public/villa_20.webp";
 import { usePathname } from "next/navigation";
 
 function BodyWrapper({
@@ -7,11 +8,18 @@ function BodyWrapper({
   children: React.ReactNode;
 }>) {
   const path = usePathname();
-  const isRoot = path === "/";
-  const bodyClassName = isRoot
-    ? "bg-[url('/villa_20.webp')] bg-cover bg-center h-dvh bg-stone-100"
-    : "";
-  return <body className={bodyClassName}>{children}</body>;
+  console.log(path);
+  const isRoot = path === "/en" || path === "/ua";
+  const bodyStyle = isRoot
+    ? {
+        backgroundImage: `url(${bg.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: "100dvh",
+      }
+    : undefined;
+
+  return <body style={bodyStyle}>{children}</body>;
 }
 
 export default BodyWrapper;

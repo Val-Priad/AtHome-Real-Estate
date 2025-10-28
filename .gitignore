@@ -42,3 +42,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 DB_Related/Thoughts.md
+DB_Related/Thoughts 2.md
