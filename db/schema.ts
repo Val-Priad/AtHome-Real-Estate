@@ -55,7 +55,7 @@ export const vicinityTypeEnum = pgEnum("VICINITY_TYPE_ENUM", [
   "Train station",
   "Post office",
   "ATM",
-  "General practitioner",
+  "Clinic",
   "Veterinarian",
   "Primary school",
   "Kindergarten",
