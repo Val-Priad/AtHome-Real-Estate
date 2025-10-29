@@ -212,6 +212,9 @@ export const estate = pgTable("estate", {
   sellerId: integer("seller_id").references(() => profile.id, {
     onDelete: "set null",
   }),
+  brokerId: integer("broker_id").references(() => profile.id, {
+    onDelete: "set null",
+  }),
   operationType: operationTypeEnum("operation_type").notNull(),
   category: estateCategoryEnum("category").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
