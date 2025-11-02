@@ -1,4 +1,4 @@
-import "@/app/globals.css";
+import "@/styles/globals.css";
 
 import BodyWrapper from "@/components/layout/BodyWrapper";
 import ClientNavigation from "@/components/layout/ClientNavigation";
