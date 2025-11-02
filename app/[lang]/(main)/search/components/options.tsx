@@ -99,7 +99,7 @@ export const VICINITY_FEATURE_OPTIONS = toOptions([
   "ATM",
   "Clinic",
   "Veterinarian",
-  "Primary school",
+  "School",
   "Kindergarten",
   "Supermarket",
   "Small shop",
