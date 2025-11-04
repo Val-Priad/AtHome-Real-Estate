@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -13,6 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { ReadyDatePicker } from "./components/DatePicker";
 import { AiDescriptionTabs } from "@/app/AiPage";
+import FormField from "./components/FormField";
 
 export type EstateFormData = {
   estate: {
@@ -156,8 +156,7 @@ function Page() {
         <section className="flex flex-col gap-3">
           <h2 className="mb-2 text-lg font-semibold">Basic Information</h2>
 
-          <div>
-            <Label htmlFor="category">Estate category</Label>
+          <FormField label="Estate category" name="category">
             <Select
               name="category"
               value={formData.estate.category || ""}
@@ -171,10 +170,9 @@ function Page() {
                 <SelectItem value="House">House</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="operationType">Operation type</Label>
+          <FormField label="Operation type" name="operationType">
             <Select
               name="operationType"
               value={formData.estate.operationType || ""}
@@ -188,10 +186,9 @@ function Page() {
                 <SelectItem value="Lease">Lease</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="buildingCondition">Building condition</Label>
+          <FormField label="Building condition" name="buildingCondition">
             <Select
               name="buildingCondition"
               value={formData.estate.buildingCondition || ""}
@@ -221,10 +218,9 @@ function Page() {
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="energyClass">Energy Class</Label>
+          <FormField label="Energy class" name="energyClass">
             <Select
               name="energyClass"
               value={formData.estate.energyClass || ""}
@@ -243,10 +239,13 @@ function Page() {
                 <SelectItem value="G">G</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="usableArea">Usable Area (m²)</Label>
+          <FormField
+            label="Usable Area (m²)"
+            name="usableArea"
+            error={errors.usableArea}
+          >
             <Input
               name="usableArea"
               type="number"
@@ -257,13 +256,13 @@ function Page() {
               }
               className={errors.usableArea ? "border-red-500" : ""}
             />
-            {errors.usableArea && (
-              <p className="text-sm text-red-500">{errors.usableArea}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="totalFloorArea">Total Floor Area (m²)</Label>
+          <FormField
+            name="totalFloorArea"
+            label="Total Floor Area (m²)"
+            error={errors.totalFloorArea}
+          >
             <Input
               name="totalFloorArea"
               type="number"
@@ -274,13 +273,9 @@ function Page() {
               }
               className={errors.totalFloorArea ? "border-red-500" : ""}
             />
-            {errors.totalFloorArea && (
-              <p className="text-sm text-red-500">{errors.totalFloorArea}</p>
-            )}
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="roadType">Road Type</Label>
+          <FormField name="roadType" label="Road type">
             <Select
               name="roadType"
               value={formData.estate.roadType || ""}
@@ -295,10 +290,9 @@ function Page() {
                 <SelectItem value="No access road">No access road</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="furnished">Furnished</Label>
+          <FormField name="furnished" label="Furnished">
             <Select
               name="furnished"
               value={formData.estate.furnished || ""}
@@ -313,10 +307,9 @@ function Page() {
                 <SelectItem value="Partially">Partially</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="easyAccess">Easy Access</Label>
+          <FormField name="easyAccess" label="Easy access">
             <Checkbox
               id="easyAccess"
               checked={!!formData.estate.easyAccess}
@@ -324,17 +317,16 @@ function Page() {
                 handleChange("estate.easyAccess", checked)
               }
             />
-          </div>
+          </FormField>
 
-          <div>
+          <FormField name="readyDate" label="Ready to move in date">
             <ReadyDatePicker
               value={formData.estate.readyDate}
               onChange={(date) => handleChange("estate.readyDate", date)}
             />
-          </div>
+          </FormField>
 
-          <div>
-            <Label htmlFor="advertLifetime">Advert Lifetime (days)</Label>
+          <FormField name="advertLifetime" label="Advert Lifetime (days)">
             <Select
               name="advertLifetime"
               value={formData.estate.advertLifetime || ""}
@@ -351,11 +343,10 @@ function Page() {
                 <SelectItem value="365">Year</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </FormField>
 
           <div className="flex gap-3">
-            <div>
-              <Label htmlFor="price">Price</Label>
+            <FormField name="price" label="Price" error={errors.price}>
               <Input
                 name="price"
                 type="number"
@@ -363,13 +354,9 @@ function Page() {
                 onChange={(e) => handleChange("estate.price", e.target.value)}
                 className={errors.price ? "border-red-500" : ""}
               />
-              {errors.price && (
-                <p className="text-sm text-red-500">Price must be positive</p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="currency">Currency</Label>
+            <FormField name="currency" label="Currency">
               <Select
                 name="currency"
                 value={formData.estate.currency || ""}
@@ -383,10 +370,9 @@ function Page() {
                   <SelectItem value="EUR">EUR</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="priceUnit">Price Unit</Label>
+            <FormField name="priceUnit" label="Price unit">
               <Select
                 name="priceUnit"
                 value={formData.estate.priceUnit || ""}
@@ -406,12 +392,15 @@ function Page() {
                   <SelectItem value="per_m2_per_day">per m² per day</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FormField>
           </div>
 
           <div className="flex flex-col gap-4">
-            <div>
-              <Label htmlFor="costOfLiving">Cost of Living</Label>
+            <FormField
+              name="costOfLiving"
+              label="Cost of living"
+              error={errors.costOfLiving}
+            >
               <Input
                 name="costOfLiving"
                 type="number"
@@ -423,15 +412,13 @@ function Page() {
                 }
                 className={errors.costOfLiving ? "border-red-500" : ""}
               />
-              {errors.costOfLiving && (
-                <p className="text-sm text-red-500">
-                  Cost of living must be positive
-                </p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="commission">Commission</Label>
+            <FormField
+              name="commission"
+              label="Commission"
+              error={errors.commission}
+            >
               <Input
                 name="commission"
                 type="number"
@@ -443,17 +430,12 @@ function Page() {
                 }
                 className={errors.commission ? "border-red-500" : ""}
               />
-              {errors.commission && (
-                <p className="text-sm text-red-500">
-                  Commission must be positive
-                </p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="commissionPaidByOwner">
-                Commission is paid by owner
-              </Label>
+            <FormField
+              name="commissionPaidByOwner"
+              label="Commission is paid by owner"
+            >
               <Checkbox
                 id="commissionPaidByOwner"
                 checked={!!formData.estate.commissionPaidByOwner}
@@ -461,10 +443,9 @@ function Page() {
                   handleChange("estate.commissionPaidByOwner", checked)
                 }
               />
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="refundableDeposit">Refundable Deposit</Label>
+            <FormField name="refundableDeposit" label="Refundable deposit">
               <Input
                 name="refundableDeposit"
                 type="number"
@@ -481,10 +462,9 @@ function Page() {
                   Refundable deposit must be positive
                 </p>
               )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="city">City</Label>
+            <FormField label="City" name="city" error={errors.city}>
               <Input
                 name="city"
                 type="text"
@@ -492,13 +472,9 @@ function Page() {
                 onChange={(e) => handleChange("estate.city", e.target.value)}
                 className={errors.city ? "border-red-500" : ""}
               />
-              {errors.city && (
-                <p className="text-sm text-red-500">City is required</p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="street">Street</Label>
+            <FormField name="street" label="Street" error={errors.street}>
               <Input
                 name="street"
                 type="text"
@@ -506,13 +482,9 @@ function Page() {
                 onChange={(e) => handleChange("estate.street", e.target.value)}
                 className={errors.street ? "border-red-500" : ""}
               />
-              {errors.street && (
-                <p className="text-sm text-red-500">Street is required</p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="region">Region</Label>
+            <FormField name="region" label="Region">
               <Select
                 name="region"
                 value={formData.estate.regionCode || ""}
@@ -550,10 +522,9 @@ function Page() {
                   <SelectItem value="UA-40">Sevastopol</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="latitude">Latitude</Label>
+            <FormField name="latitude" label="Latitude" error={errors.latitude}>
               <Input
                 name="latitude"
                 type="number"
@@ -564,13 +535,13 @@ function Page() {
                 }
                 className={errors.latitude ? "border-red-500" : ""}
               />
-              {errors.latitude && (
-                <p className="text-sm text-red-500">Latitude is required</p>
-              )}
-            </div>
+            </FormField>
 
-            <div>
-              <Label htmlFor="longitude">Longitude</Label>
+            <FormField
+              name="longitude"
+              label="Longitude"
+              error={errors.longitude}
+            >
               <Input
                 name="longitude"
                 type="number"
@@ -581,16 +552,16 @@ function Page() {
                 }
                 className={errors.longitude ? "border-red-500" : ""}
               />
-              {errors.longitude && (
-                <p className="text-sm text-red-500">Longitude is required</p>
-              )}
-            </div>
+            </FormField>
           </div>
 
           {formData.estate.category === "House" && (
             <>
-              <div>
-                <Label htmlFor="gardenArea">Garden Area (m²)</Label>
+              <FormField
+                name="gardenArea"
+                label="Garden Area (m²)"
+                error={errors.gardenArea}
+              >
                 <Input
                   name="gardenArea"
                   type="number"
@@ -602,13 +573,13 @@ function Page() {
                   }
                   className={errors.gardenArea ? "border-red-500" : ""}
                 />
-                {errors.gardenArea && (
-                  <p className="text-sm text-red-500">{errors.gardenArea}</p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="buildingArea">Building Area (m²)</Label>
+              <FormField
+                name="buildingArea"
+                label="Building Area (m²)"
+                error={errors.buildingArea}
+              >
                 <Input
                   name="buildingArea"
                   type="number"
@@ -623,10 +594,13 @@ function Page() {
                 {errors.buildingArea && (
                   <p className="text-sm text-red-500">{errors.buildingArea}</p>
                 )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="reconstructionYear">Reconstruction Year</Label>
+              <FormField
+                name="reconstructionYear"
+                label="Reconstruction year"
+                error={errors.reconstructionYear}
+              >
                 <Input
                   name="reconstructionYear"
                   type="number"
@@ -641,15 +615,13 @@ function Page() {
                   }
                   className={errors.reconstructionYear ? "border-red-500" : ""}
                 />
-                {errors.reconstructionYear && (
-                  <p className="text-sm text-red-500">
-                    {errors.reconstructionYear}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="acceptanceYear">Acceptance Year</Label>
+              <FormField
+                name="acceptanceYear"
+                label="Acceptance Year"
+                error={errors.acceptanceYear}
+              >
                 <Input
                   name="acceptanceYear"
                   type="number"
@@ -661,15 +633,9 @@ function Page() {
                   }
                   className={errors.acceptanceYear ? "border-red-500" : ""}
                 />
-                {errors.acceptanceYear && (
-                  <p className="text-sm text-red-500">
-                    {errors.acceptanceYear}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="houseCategory">House Category</Label>
+              <FormField name="houseCategory" label="House Category">
                 <Select
                   name="houseCategory"
                   value={formData.estateHouse?.houseCategory || ""}
@@ -695,10 +661,9 @@ function Page() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="roomCount">Room Count</Label>
+              <FormField name="roomCount" label="Room Count">
                 <Select
                   name="roomCount"
                   value={formData.estateHouse?.roomCount || ""}
@@ -718,10 +683,9 @@ function Page() {
                     <SelectItem value="Atypical">Atypical</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="houseType">House Type</Label>
+              <FormField name="houseType" label="House Type">
                 <Select
                   name="houseType"
                   value={formData.estateHouse?.houseType || ""}
@@ -738,10 +702,9 @@ function Page() {
                     <SelectItem value="Terraced">Terraced</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="floors">Floors</Label>
+              <FormField name="floors" label="Floors" error={errors.floors}>
                 <Input
                   name="floors"
                   type="number"
@@ -756,10 +719,13 @@ function Page() {
                 {errors.floors && (
                   <p className="text-sm text-red-500">{errors.floors}</p>
                 )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="undergroundFloors">Underground Floors</Label>
+              <FormField
+                name="undergroundFloors"
+                label="Underground Floors"
+                error={errors.undergroundFloors}
+              >
                 <Input
                   name="undergroundFloors"
                   type="number"
@@ -774,15 +740,13 @@ function Page() {
                   }
                   className={errors.undergroundFloors ? "border-red-500" : ""}
                 />
-                {errors.undergroundFloors && (
-                  <p className="text-sm text-red-500">
-                    {errors.undergroundFloors}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="parkingLotsCount">Parking Lots Count</Label>
+              <FormField
+                name="parkingLotsCount"
+                label="Parking Lots Count"
+                error={errors.parkingLotsCount}
+              >
                 <Input
                   name="parkingLotsCount"
                   type="number"
@@ -794,15 +758,9 @@ function Page() {
                   }
                   className={errors.parkingLotsCount ? "border-red-500" : ""}
                 />
-                {errors.parkingLotsCount && (
-                  <p className="text-sm text-red-500">
-                    {errors.parkingLotsCount}
-                  </p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="circuitBreaker">Circuit Breaker</Label>
+              <FormField name="circuitBreaker" label="Circuit Breaker">
                 <Select
                   name="circuitBreaker"
                   value={formData.estateHouse?.circuitBreaker || ""}
@@ -820,10 +778,9 @@ function Page() {
                     <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="phase">Phase</Label>
+              <FormField name="phase" label="Phase">
                 <Select
                   name="phase"
                   value={formData.estateHouse?.phase || ""}
@@ -837,10 +794,9 @@ function Page() {
                     <SelectItem value="Three-phase">Three-phase</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="pool">Pool</Label>
+              <FormField name="pool" label="Pool">
                 <Checkbox
                   id="pool"
                   checked={!!formData.estateHouse?.pool}
@@ -848,10 +804,9 @@ function Page() {
                     handleChange("estateHouse.pool", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="cellar">Cellar</Label>
+              <FormField name="cellar" label="Cellar">
                 <Checkbox
                   id="cellar"
                   checked={!!formData.estateHouse?.cellar}
@@ -859,10 +814,9 @@ function Page() {
                     handleChange("estateHouse.cellar", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="garage">Garage</Label>
+              <FormField label="Garage" name="garage">
                 <Checkbox
                   id="garage"
                   checked={!!formData.estateHouse?.garage}
@@ -870,10 +824,9 @@ function Page() {
                     handleChange("estateHouse.garage", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="pvPanels">PV Panels</Label>
+              <FormField label="PV Panels" name="pvPanels">
                 <Checkbox
                   id="pvPanels"
                   checked={!!formData.estateHouse?.pvPanels}
@@ -881,10 +834,9 @@ function Page() {
                     handleChange("estateHouse.pvPanels", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="solarWaterHeating">Solar Water Heating</Label>
+              <FormField name="solarWaterHeating" label="Solar Water Heating">
                 <Checkbox
                   id="solarWaterHeating"
                   checked={!!formData.estateHouse?.solarWaterHeating}
@@ -892,14 +844,13 @@ function Page() {
                     handleChange("estateHouse.solarWaterHeating", checked)
                   }
                 />
-              </div>
+              </FormField>
             </>
           )}
 
           {formData.estate.category === "Apartment" && (
             <>
-              <div>
-                <Label htmlFor="flatClass">Flat Class</Label>
+              <FormField name="flatClass" label="Flat Class">
                 <Select
                   name="flatClass"
                   value={formData.estateApartment?.flatClass || ""}
@@ -917,10 +868,9 @@ function Page() {
                     <SelectItem value="Single-story">Single-story</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="buildingType">Building Type</Label>
+              <FormField name="buildingType" label="Building Type">
                 <Select
                   name="buildingType"
                   value={formData.estateApartment?.buildingType || ""}
@@ -937,10 +887,9 @@ function Page() {
                     <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="advertSubtype">Advert Subtype</Label>
+              <FormField name="advertSubtype" label="Advert Subtype">
                 <Select
                   name="advertSubtype"
                   value={formData.estateApartment?.advertSubtype || ""}
@@ -967,11 +916,14 @@ function Page() {
                     <SelectItem value="Room">Room</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormField>
 
               {/* Balcony Area */}
-              <div>
-                <Label htmlFor="balconyArea">Balcony Area (m²)</Label>
+              <FormField
+                name="balconyArea"
+                label="Balcony Area (m²)"
+                error={errors.balconyArea}
+              >
                 <Input
                   name="balconyArea"
                   type="number"
@@ -982,14 +934,14 @@ function Page() {
                   }
                   className={errors.balconyArea ? "border-red-500" : ""}
                 />
-                {errors.balconyArea && (
-                  <p className="text-sm text-red-500">{errors.balconyArea}</p>
-                )}
-              </div>
+              </FormField>
 
               {/* Loggia Area */}
-              <div>
-                <Label htmlFor="loggiaArea">Loggia Area (m²)</Label>
+              <FormField
+                name="loggiaArea"
+                label="Loggia Area (m²)"
+                error={errors.loggiaArea}
+              >
                 <Input
                   name="loggiaArea"
                   type="number"
@@ -1000,14 +952,14 @@ function Page() {
                   }
                   className={errors.loggiaArea ? "border-red-500" : ""}
                 />
-                {errors.loggiaArea && (
-                  <p className="text-sm text-red-500">{errors.loggiaArea}</p>
-                )}
-              </div>
+              </FormField>
 
               {/* Terrace Area */}
-              <div>
-                <Label htmlFor="terraceArea">Terrace Area (m²)</Label>
+              <FormField
+                name="terraceArea"
+                label="Terrace Area (m²)"
+                error={errors.terraceArea}
+              >
                 <Input
                   name="terraceArea"
                   type="number"
@@ -1018,13 +970,9 @@ function Page() {
                   }
                   className={errors.terraceArea ? "border-red-500" : ""}
                 />
-                {errors.terraceArea && (
-                  <p className="text-sm text-red-500">{errors.terraceArea}</p>
-                )}
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="garden">Garden</Label>
+              <FormField name="garden" label="Garden">
                 <Checkbox
                   id="garden"
                   checked={!!formData.estateApartment?.garden}
@@ -1032,10 +980,9 @@ function Page() {
                     handleChange("estateApartment.garden", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="parking">Parking</Label>
+              <FormField name="parking" label="Parking">
                 <Checkbox
                   id="parking"
                   checked={!!formData.estateApartment?.parking}
@@ -1043,10 +990,9 @@ function Page() {
                     handleChange("estateApartment.parking", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="elevator">Elevator</Label>
+              <FormField name="elevator" label="Elevator">
                 <Checkbox
                   id="elevator"
                   checked={!!formData.estateApartment?.elevator}
@@ -1054,10 +1000,13 @@ function Page() {
                     handleChange("estateApartment.elevator", checked)
                   }
                 />
-              </div>
+              </FormField>
 
-              <div>
-                <Label htmlFor="floorNumber">Floor Number</Label>
+              <FormField
+                label="Floor Number"
+                name="floorNumber"
+                error={errors.floorNumber}
+              >
                 <Input
                   name="floorNumber"
                   type="number"
@@ -1067,14 +1016,13 @@ function Page() {
                   }
                   className={errors.floorNumber ? "border-red-500" : ""}
                 />
-                {errors.floorNumber && (
-                  <p className="text-sm text-red-500">
-                    Floor number must be a positive integer
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="apartmentNumber">Apartment Number</Label>
+              </FormField>
+
+              <FormField
+                name="apartmentNumber"
+                label="Apartment Number"
+                error={errors.apartmentNumber}
+              >
                 <Input
                   name="apartmentNumber"
                   type="text"
@@ -1087,12 +1035,7 @@ function Page() {
                   }
                   className={errors.apartmentNumber ? "border-red-500" : ""}
                 />
-                {errors.apartmentNumber && (
-                  <p className="text-sm text-red-500">
-                    Apartment number is required
-                  </p>
-                )}
-              </div>
+              </FormField>
             </>
           )}
           {/* <AiDescriptionTabs /> */}
