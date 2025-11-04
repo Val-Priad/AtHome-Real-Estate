@@ -222,199 +222,6 @@ function Page() {
               </SelectContent>
             </Select>
           </div>
-          {formData.estate.category === "House" && (
-            <>
-              <div>
-                <Label htmlFor="reconstructionYear">Reconstruction Year</Label>
-                <Input
-                  name="reconstructionYear"
-                  type="number"
-                  step="1"
-                  min={0}
-                  value={formData.estateHouse?.reconstructionYear || ""}
-                  onChange={(e) =>
-                    handleChange(
-                      "estateHouse.reconstructionYear",
-                      e.target.value,
-                    )
-                  }
-                  className={errors.reconstructionYear ? "border-red-500" : ""}
-                />
-                {errors.reconstructionYear && (
-                  <p className="text-sm text-red-500">
-                    {errors.reconstructionYear}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="acceptanceYear">Acceptance Year</Label>
-                <Input
-                  name="acceptanceYear"
-                  type="number"
-                  step="1"
-                  min={0}
-                  value={formData.estateHouse?.acceptanceYear || ""}
-                  onChange={(e) =>
-                    handleChange("estateHouse.acceptanceYear", e.target.value)
-                  }
-                  className={errors.acceptanceYear ? "border-red-500" : ""}
-                />
-                {errors.acceptanceYear && (
-                  <p className="text-sm text-red-500">
-                    {errors.acceptanceYear}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="houseCategory">House Category</Label>
-                <Select
-                  name="houseCategory"
-                  value={formData.estateHouse?.houseCategory || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateHouse.houseCategory", v)
-                  }
-                >
-                  <SelectTrigger id="houseCategory">
-                    <SelectValue placeholder="Select house category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Cottage">Cottage</SelectItem>
-                    <SelectItem value="Monument/Other">
-                      Monument/Other
-                    </SelectItem>
-                    <SelectItem value="Family house">Family house</SelectItem>
-                    <SelectItem value="Villa">Villa</SelectItem>
-                    <SelectItem value="Turnkey">Turnkey</SelectItem>
-                    <SelectItem value="Country house">Country house</SelectItem>
-                    <SelectItem value="Farmstead">Farmstead</SelectItem>
-                    <SelectItem value="Multi-generational house">
-                      Multi-generational house
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="roomCount">Room Count</Label>
-                <Select
-                  name="roomCount"
-                  value={formData.estateHouse?.roomCount || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateHouse.roomCount", v)
-                  }
-                >
-                  <SelectTrigger id="roomCount">
-                    <SelectValue placeholder="Select room count" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                    <SelectItem value="5+">5+</SelectItem>
-                    <SelectItem value="Atypical">Atypical</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="houseType">House Type</Label>
-                <Select
-                  name="houseType"
-                  value={formData.estateHouse?.houseType || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateHouse.houseType", v)
-                  }
-                >
-                  <SelectTrigger id="houseType">
-                    <SelectValue placeholder="Select house type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Detached">Detached</SelectItem>
-                    <SelectItem value="Semi-detached">Semi-detached</SelectItem>
-                    <SelectItem value="Terraced">Terraced</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
-
-          {formData.estate.category === "Apartment" && (
-            <>
-              <div>
-                <Label htmlFor="flatClass">Flat Class</Label>
-                <Select
-                  name="flatClass"
-                  value={formData.estateApartment?.flatClass || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateApartment.flatClass", v)
-                  }
-                >
-                  <SelectTrigger id="flatClass">
-                    <SelectValue placeholder="Select flat class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Maisonette">Maisonette</SelectItem>
-                    <SelectItem value="Loft">Loft</SelectItem>
-                    <SelectItem value="Attic">Attic</SelectItem>
-                    <SelectItem value="Single-story">Single-story</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="buildingType">Building Type</Label>
-                <Select
-                  name="buildingType"
-                  value={formData.estateApartment?.buildingType || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateApartment.buildingType", v)
-                  }
-                >
-                  <SelectTrigger id="buildingType">
-                    <SelectValue placeholder="Select building type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Panel">Panel</SelectItem>
-                    <SelectItem value="Brick">Brick</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="advertSubtype">Advert Subtype</Label>
-                <Select
-                  name="advertSubtype"
-                  value={formData.estateApartment?.advertSubtype || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateApartment.advertSubtype", v)
-                  }
-                >
-                  <SelectTrigger id="advertSubtype">
-                    <SelectValue placeholder="Select advert subtype" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1 studio">1 studio</SelectItem>
-                    <SelectItem value="1+1">1+1</SelectItem>
-                    <SelectItem value="2 studio">2 studio</SelectItem>
-                    <SelectItem value="2+1">2+1</SelectItem>
-                    <SelectItem value="3 studio">3 studio</SelectItem>
-                    <SelectItem value="3+1">3+1</SelectItem>
-                    <SelectItem value="4 studio">4 studio</SelectItem>
-                    <SelectItem value="4+1">4+1</SelectItem>
-                    <SelectItem value="5 studio">5 studio</SelectItem>
-                    <SelectItem value="5+1">5+1</SelectItem>
-                    <SelectItem value="6 or more">6 or more</SelectItem>
-                    <SelectItem value="Atypical">Atypical</SelectItem>
-                    <SelectItem value="Room">Room</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
 
           <div>
             <Label htmlFor="energyClass">Energy Class</Label>
@@ -472,104 +279,6 @@ function Page() {
             )}
           </div>
 
-          {formData.estate.category === "House" && (
-            <>
-              <div>
-                <Label htmlFor="gardenArea">Garden Area (m²)</Label>
-                <Input
-                  name="gardenArea"
-                  type="number"
-                  step="any"
-                  min={0}
-                  value={formData.estateHouse?.gardenArea || ""}
-                  onChange={(e) =>
-                    handleChange("estateHouse.gardenArea", e.target.value)
-                  }
-                  className={errors.gardenArea ? "border-red-500" : ""}
-                />
-                {errors.gardenArea && (
-                  <p className="text-sm text-red-500">{errors.gardenArea}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="buildingArea">Building Area (m²)</Label>
-                <Input
-                  name="buildingArea"
-                  type="number"
-                  step="any"
-                  min={0}
-                  value={formData.estateHouse?.buildingArea || ""}
-                  onChange={(e) =>
-                    handleChange("estateHouse.buildingArea", e.target.value)
-                  }
-                  className={errors.buildingArea ? "border-red-500" : ""}
-                />
-                {errors.buildingArea && (
-                  <p className="text-sm text-red-500">{errors.buildingArea}</p>
-                )}
-              </div>
-            </>
-          )}
-
-          {formData.estate.category === "Apartment" && (
-            <>
-              {/* Balcony Area */}
-              <div>
-                <Label htmlFor="balconyArea">Balcony Area (m²)</Label>
-                <Input
-                  name="balconyArea"
-                  type="number"
-                  step="any"
-                  value={formData.estateApartment?.balconyArea || ""}
-                  onChange={(e) =>
-                    handleChange("estateApartment.balconyArea", e.target.value)
-                  }
-                  className={errors.balconyArea ? "border-red-500" : ""}
-                />
-                {errors.balconyArea && (
-                  <p className="text-sm text-red-500">{errors.balconyArea}</p>
-                )}
-              </div>
-
-              {/* Loggia Area */}
-              <div>
-                <Label htmlFor="loggiaArea">Loggia Area (m²)</Label>
-                <Input
-                  name="loggiaArea"
-                  type="number"
-                  step="any"
-                  value={formData.estateApartment?.loggiaArea || ""}
-                  onChange={(e) =>
-                    handleChange("estateApartment.loggiaArea", e.target.value)
-                  }
-                  className={errors.loggiaArea ? "border-red-500" : ""}
-                />
-                {errors.loggiaArea && (
-                  <p className="text-sm text-red-500">{errors.loggiaArea}</p>
-                )}
-              </div>
-
-              {/* Terrace Area */}
-              <div>
-                <Label htmlFor="terraceArea">Terrace Area (m²)</Label>
-                <Input
-                  name="terraceArea"
-                  type="number"
-                  step="any"
-                  value={formData.estateApartment?.terraceArea || ""}
-                  onChange={(e) =>
-                    handleChange("estateApartment.terraceArea", e.target.value)
-                  }
-                  className={errors.terraceArea ? "border-red-500" : ""}
-                />
-                {errors.terraceArea && (
-                  <p className="text-sm text-red-500">{errors.terraceArea}</p>
-                )}
-              </div>
-            </>
-          )}
-
           <div>
             <Label htmlFor="roadType">Road Type</Label>
             <Select
@@ -587,109 +296,6 @@ function Page() {
               </SelectContent>
             </Select>
           </div>
-
-          {formData.estate.category === "House" && (
-            <>
-              <div>
-                <Label htmlFor="floors">Floors</Label>
-                <Input
-                  name="floors"
-                  type="number"
-                  step="1"
-                  min={0}
-                  value={formData.estateHouse?.floors || ""}
-                  onChange={(e) =>
-                    handleChange("estateHouse.floors", e.target.value)
-                  }
-                  className={errors.floors ? "border-red-500" : ""}
-                />
-                {errors.floors && (
-                  <p className="text-sm text-red-500">{errors.floors}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="undergroundFloors">Underground Floors</Label>
-                <Input
-                  name="undergroundFloors"
-                  type="number"
-                  step="1"
-                  min={0}
-                  value={formData.estateHouse?.undergroundFloors || ""}
-                  onChange={(e) =>
-                    handleChange(
-                      "estateHouse.undergroundFloors",
-                      e.target.value,
-                    )
-                  }
-                  className={errors.undergroundFloors ? "border-red-500" : ""}
-                />
-                {errors.undergroundFloors && (
-                  <p className="text-sm text-red-500">
-                    {errors.undergroundFloors}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="parkingLotsCount">Parking Lots Count</Label>
-                <Input
-                  name="parkingLotsCount"
-                  type="number"
-                  step="1"
-                  min={0}
-                  value={formData.estateHouse?.parkingLotsCount || ""}
-                  onChange={(e) =>
-                    handleChange("estateHouse.parkingLotsCount", e.target.value)
-                  }
-                  className={errors.parkingLotsCount ? "border-red-500" : ""}
-                />
-                {errors.parkingLotsCount && (
-                  <p className="text-sm text-red-500">
-                    {errors.parkingLotsCount}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="circuitBreaker">Circuit Breaker</Label>
-                <Select
-                  name="circuitBreaker"
-                  value={formData.estateHouse?.circuitBreaker || ""}
-                  onValueChange={(v) =>
-                    handleChange("estateHouse.circuitBreaker", v)
-                  }
-                >
-                  <SelectTrigger id="circuitBreaker">
-                    <SelectValue placeholder="Select circuit breaker" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="20A">20A</SelectItem>
-                    <SelectItem value="25A">25A</SelectItem>
-                    <SelectItem value="32A">32A</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="phase">Phase</Label>
-                <Select
-                  name="phase"
-                  value={formData.estateHouse?.phase || ""}
-                  onValueChange={(v) => handleChange("estateHouse.phase", v)}
-                >
-                  <SelectTrigger id="phase">
-                    <SelectValue placeholder="Select phase" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Single-phase">Single-phase</SelectItem>
-                    <SelectItem value="Three-phase">Three-phase</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
 
           <div>
             <Label htmlFor="furnished">Furnished</Label>
@@ -719,102 +325,6 @@ function Page() {
               }
             />
           </div>
-
-          {formData.estate.category === "House" && (
-            <>
-              <div>
-                <Label htmlFor="pool">Pool</Label>
-                <Checkbox
-                  id="pool"
-                  checked={!!formData.estateHouse?.pool}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateHouse.pool", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="cellar">Cellar</Label>
-                <Checkbox
-                  id="cellar"
-                  checked={!!formData.estateHouse?.cellar}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateHouse.cellar", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="garage">Garage</Label>
-                <Checkbox
-                  id="garage"
-                  checked={!!formData.estateHouse?.garage}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateHouse.garage", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="pvPanels">PV Panels</Label>
-                <Checkbox
-                  id="pvPanels"
-                  checked={!!formData.estateHouse?.pvPanels}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateHouse.pvPanels", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="solarWaterHeating">Solar Water Heating</Label>
-                <Checkbox
-                  id="solarWaterHeating"
-                  checked={!!formData.estateHouse?.solarWaterHeating}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateHouse.solarWaterHeating", checked)
-                  }
-                />
-              </div>
-            </>
-          )}
-
-          {formData.estate.category === "Apartment" && (
-            <>
-              <div>
-                <Label htmlFor="garden">Garden</Label>
-                <Checkbox
-                  id="garden"
-                  checked={!!formData.estateApartment?.garden}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateApartment.garden", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="parking">Parking</Label>
-                <Checkbox
-                  id="parking"
-                  checked={!!formData.estateApartment?.parking}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateApartment.parking", checked)
-                  }
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="elevator">Elevator</Label>
-                <Checkbox
-                  id="elevator"
-                  checked={!!formData.estateApartment?.elevator}
-                  onCheckedChange={(checked) =>
-                    handleChange("estateApartment.elevator", checked)
-                  }
-                />
-              </div>
-            </>
-          )}
 
           <div>
             <ReadyDatePicker
@@ -973,51 +483,6 @@ function Page() {
               )}
             </div>
 
-            {formData.estate.category === "Apartment" && (
-              <>
-                <div>
-                  <Label htmlFor="floorNumber">Floor Number</Label>
-                  <Input
-                    name="floorNumber"
-                    type="number"
-                    value={formData.estateApartment?.floorNumber || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "estateApartment.floorNumber",
-                        e.target.value,
-                      )
-                    }
-                    className={errors.floorNumber ? "border-red-500" : ""}
-                  />
-                  {errors.floorNumber && (
-                    <p className="text-sm text-red-500">
-                      Floor number must be a positive integer
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="apartmentNumber">Apartment Number</Label>
-                  <Input
-                    name="apartmentNumber"
-                    type="text"
-                    value={formData.estateApartment?.apartmentNumber || ""}
-                    onChange={(e) =>
-                      handleChange(
-                        "estateApartment.apartmentNumber",
-                        e.target.value,
-                      )
-                    }
-                    className={errors.apartmentNumber ? "border-red-500" : ""}
-                  />
-                  {errors.apartmentNumber && (
-                    <p className="text-sm text-red-500">
-                      Apartment number is required
-                    </p>
-                  )}
-                </div>
-              </>
-            )}
-
             <div>
               <Label htmlFor="city">City</Label>
               <Input
@@ -1121,6 +586,515 @@ function Page() {
               )}
             </div>
           </div>
+
+          {formData.estate.category === "House" && (
+            <>
+              <div>
+                <Label htmlFor="gardenArea">Garden Area (m²)</Label>
+                <Input
+                  name="gardenArea"
+                  type="number"
+                  step="any"
+                  min={0}
+                  value={formData.estateHouse?.gardenArea || ""}
+                  onChange={(e) =>
+                    handleChange("estateHouse.gardenArea", e.target.value)
+                  }
+                  className={errors.gardenArea ? "border-red-500" : ""}
+                />
+                {errors.gardenArea && (
+                  <p className="text-sm text-red-500">{errors.gardenArea}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="buildingArea">Building Area (m²)</Label>
+                <Input
+                  name="buildingArea"
+                  type="number"
+                  step="any"
+                  min={0}
+                  value={formData.estateHouse?.buildingArea || ""}
+                  onChange={(e) =>
+                    handleChange("estateHouse.buildingArea", e.target.value)
+                  }
+                  className={errors.buildingArea ? "border-red-500" : ""}
+                />
+                {errors.buildingArea && (
+                  <p className="text-sm text-red-500">{errors.buildingArea}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="reconstructionYear">Reconstruction Year</Label>
+                <Input
+                  name="reconstructionYear"
+                  type="number"
+                  step="1"
+                  min={0}
+                  value={formData.estateHouse?.reconstructionYear || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "estateHouse.reconstructionYear",
+                      e.target.value,
+                    )
+                  }
+                  className={errors.reconstructionYear ? "border-red-500" : ""}
+                />
+                {errors.reconstructionYear && (
+                  <p className="text-sm text-red-500">
+                    {errors.reconstructionYear}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="acceptanceYear">Acceptance Year</Label>
+                <Input
+                  name="acceptanceYear"
+                  type="number"
+                  step="1"
+                  min={0}
+                  value={formData.estateHouse?.acceptanceYear || ""}
+                  onChange={(e) =>
+                    handleChange("estateHouse.acceptanceYear", e.target.value)
+                  }
+                  className={errors.acceptanceYear ? "border-red-500" : ""}
+                />
+                {errors.acceptanceYear && (
+                  <p className="text-sm text-red-500">
+                    {errors.acceptanceYear}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="houseCategory">House Category</Label>
+                <Select
+                  name="houseCategory"
+                  value={formData.estateHouse?.houseCategory || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateHouse.houseCategory", v)
+                  }
+                >
+                  <SelectTrigger id="houseCategory">
+                    <SelectValue placeholder="Select house category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Cottage">Cottage</SelectItem>
+                    <SelectItem value="Monument/Other">
+                      Monument/Other
+                    </SelectItem>
+                    <SelectItem value="Family house">Family house</SelectItem>
+                    <SelectItem value="Villa">Villa</SelectItem>
+                    <SelectItem value="Turnkey">Turnkey</SelectItem>
+                    <SelectItem value="Country house">Country house</SelectItem>
+                    <SelectItem value="Farmstead">Farmstead</SelectItem>
+                    <SelectItem value="Multi-generational house">
+                      Multi-generational house
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="roomCount">Room Count</Label>
+                <Select
+                  name="roomCount"
+                  value={formData.estateHouse?.roomCount || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateHouse.roomCount", v)
+                  }
+                >
+                  <SelectTrigger id="roomCount">
+                    <SelectValue placeholder="Select room count" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                    <SelectItem value="5+">5+</SelectItem>
+                    <SelectItem value="Atypical">Atypical</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="houseType">House Type</Label>
+                <Select
+                  name="houseType"
+                  value={formData.estateHouse?.houseType || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateHouse.houseType", v)
+                  }
+                >
+                  <SelectTrigger id="houseType">
+                    <SelectValue placeholder="Select house type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Detached">Detached</SelectItem>
+                    <SelectItem value="Semi-detached">Semi-detached</SelectItem>
+                    <SelectItem value="Terraced">Terraced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="floors">Floors</Label>
+                <Input
+                  name="floors"
+                  type="number"
+                  step="1"
+                  min={0}
+                  value={formData.estateHouse?.floors || ""}
+                  onChange={(e) =>
+                    handleChange("estateHouse.floors", e.target.value)
+                  }
+                  className={errors.floors ? "border-red-500" : ""}
+                />
+                {errors.floors && (
+                  <p className="text-sm text-red-500">{errors.floors}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="undergroundFloors">Underground Floors</Label>
+                <Input
+                  name="undergroundFloors"
+                  type="number"
+                  step="1"
+                  min={0}
+                  value={formData.estateHouse?.undergroundFloors || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "estateHouse.undergroundFloors",
+                      e.target.value,
+                    )
+                  }
+                  className={errors.undergroundFloors ? "border-red-500" : ""}
+                />
+                {errors.undergroundFloors && (
+                  <p className="text-sm text-red-500">
+                    {errors.undergroundFloors}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="parkingLotsCount">Parking Lots Count</Label>
+                <Input
+                  name="parkingLotsCount"
+                  type="number"
+                  step="1"
+                  min={0}
+                  value={formData.estateHouse?.parkingLotsCount || ""}
+                  onChange={(e) =>
+                    handleChange("estateHouse.parkingLotsCount", e.target.value)
+                  }
+                  className={errors.parkingLotsCount ? "border-red-500" : ""}
+                />
+                {errors.parkingLotsCount && (
+                  <p className="text-sm text-red-500">
+                    {errors.parkingLotsCount}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="circuitBreaker">Circuit Breaker</Label>
+                <Select
+                  name="circuitBreaker"
+                  value={formData.estateHouse?.circuitBreaker || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateHouse.circuitBreaker", v)
+                  }
+                >
+                  <SelectTrigger id="circuitBreaker">
+                    <SelectValue placeholder="Select circuit breaker" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="20A">20A</SelectItem>
+                    <SelectItem value="25A">25A</SelectItem>
+                    <SelectItem value="32A">32A</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="phase">Phase</Label>
+                <Select
+                  name="phase"
+                  value={formData.estateHouse?.phase || ""}
+                  onValueChange={(v) => handleChange("estateHouse.phase", v)}
+                >
+                  <SelectTrigger id="phase">
+                    <SelectValue placeholder="Select phase" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Single-phase">Single-phase</SelectItem>
+                    <SelectItem value="Three-phase">Three-phase</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="pool">Pool</Label>
+                <Checkbox
+                  id="pool"
+                  checked={!!formData.estateHouse?.pool}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateHouse.pool", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="cellar">Cellar</Label>
+                <Checkbox
+                  id="cellar"
+                  checked={!!formData.estateHouse?.cellar}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateHouse.cellar", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="garage">Garage</Label>
+                <Checkbox
+                  id="garage"
+                  checked={!!formData.estateHouse?.garage}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateHouse.garage", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="pvPanels">PV Panels</Label>
+                <Checkbox
+                  id="pvPanels"
+                  checked={!!formData.estateHouse?.pvPanels}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateHouse.pvPanels", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="solarWaterHeating">Solar Water Heating</Label>
+                <Checkbox
+                  id="solarWaterHeating"
+                  checked={!!formData.estateHouse?.solarWaterHeating}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateHouse.solarWaterHeating", checked)
+                  }
+                />
+              </div>
+            </>
+          )}
+
+          {formData.estate.category === "Apartment" && (
+            <>
+              <div>
+                <Label htmlFor="flatClass">Flat Class</Label>
+                <Select
+                  name="flatClass"
+                  value={formData.estateApartment?.flatClass || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateApartment.flatClass", v)
+                  }
+                >
+                  <SelectTrigger id="flatClass">
+                    <SelectValue placeholder="Select flat class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Maisonette">Maisonette</SelectItem>
+                    <SelectItem value="Loft">Loft</SelectItem>
+                    <SelectItem value="Attic">Attic</SelectItem>
+                    <SelectItem value="Single-story">Single-story</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="buildingType">Building Type</Label>
+                <Select
+                  name="buildingType"
+                  value={formData.estateApartment?.buildingType || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateApartment.buildingType", v)
+                  }
+                >
+                  <SelectTrigger id="buildingType">
+                    <SelectValue placeholder="Select building type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Panel">Panel</SelectItem>
+                    <SelectItem value="Brick">Brick</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="advertSubtype">Advert Subtype</Label>
+                <Select
+                  name="advertSubtype"
+                  value={formData.estateApartment?.advertSubtype || ""}
+                  onValueChange={(v) =>
+                    handleChange("estateApartment.advertSubtype", v)
+                  }
+                >
+                  <SelectTrigger id="advertSubtype">
+                    <SelectValue placeholder="Select advert subtype" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1 studio">1 studio</SelectItem>
+                    <SelectItem value="1+1">1+1</SelectItem>
+                    <SelectItem value="2 studio">2 studio</SelectItem>
+                    <SelectItem value="2+1">2+1</SelectItem>
+                    <SelectItem value="3 studio">3 studio</SelectItem>
+                    <SelectItem value="3+1">3+1</SelectItem>
+                    <SelectItem value="4 studio">4 studio</SelectItem>
+                    <SelectItem value="4+1">4+1</SelectItem>
+                    <SelectItem value="5 studio">5 studio</SelectItem>
+                    <SelectItem value="5+1">5+1</SelectItem>
+                    <SelectItem value="6 or more">6 or more</SelectItem>
+                    <SelectItem value="Atypical">Atypical</SelectItem>
+                    <SelectItem value="Room">Room</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Balcony Area */}
+              <div>
+                <Label htmlFor="balconyArea">Balcony Area (m²)</Label>
+                <Input
+                  name="balconyArea"
+                  type="number"
+                  step="any"
+                  value={formData.estateApartment?.balconyArea || ""}
+                  onChange={(e) =>
+                    handleChange("estateApartment.balconyArea", e.target.value)
+                  }
+                  className={errors.balconyArea ? "border-red-500" : ""}
+                />
+                {errors.balconyArea && (
+                  <p className="text-sm text-red-500">{errors.balconyArea}</p>
+                )}
+              </div>
+
+              {/* Loggia Area */}
+              <div>
+                <Label htmlFor="loggiaArea">Loggia Area (m²)</Label>
+                <Input
+                  name="loggiaArea"
+                  type="number"
+                  step="any"
+                  value={formData.estateApartment?.loggiaArea || ""}
+                  onChange={(e) =>
+                    handleChange("estateApartment.loggiaArea", e.target.value)
+                  }
+                  className={errors.loggiaArea ? "border-red-500" : ""}
+                />
+                {errors.loggiaArea && (
+                  <p className="text-sm text-red-500">{errors.loggiaArea}</p>
+                )}
+              </div>
+
+              {/* Terrace Area */}
+              <div>
+                <Label htmlFor="terraceArea">Terrace Area (m²)</Label>
+                <Input
+                  name="terraceArea"
+                  type="number"
+                  step="any"
+                  value={formData.estateApartment?.terraceArea || ""}
+                  onChange={(e) =>
+                    handleChange("estateApartment.terraceArea", e.target.value)
+                  }
+                  className={errors.terraceArea ? "border-red-500" : ""}
+                />
+                {errors.terraceArea && (
+                  <p className="text-sm text-red-500">{errors.terraceArea}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="garden">Garden</Label>
+                <Checkbox
+                  id="garden"
+                  checked={!!formData.estateApartment?.garden}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateApartment.garden", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="parking">Parking</Label>
+                <Checkbox
+                  id="parking"
+                  checked={!!formData.estateApartment?.parking}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateApartment.parking", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="elevator">Elevator</Label>
+                <Checkbox
+                  id="elevator"
+                  checked={!!formData.estateApartment?.elevator}
+                  onCheckedChange={(checked) =>
+                    handleChange("estateApartment.elevator", checked)
+                  }
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="floorNumber">Floor Number</Label>
+                <Input
+                  name="floorNumber"
+                  type="number"
+                  value={formData.estateApartment?.floorNumber || ""}
+                  onChange={(e) =>
+                    handleChange("estateApartment.floorNumber", e.target.value)
+                  }
+                  className={errors.floorNumber ? "border-red-500" : ""}
+                />
+                {errors.floorNumber && (
+                  <p className="text-sm text-red-500">
+                    Floor number must be a positive integer
+                  </p>
+                )}
+              </div>
+              <div>
+                <Label htmlFor="apartmentNumber">Apartment Number</Label>
+                <Input
+                  name="apartmentNumber"
+                  type="text"
+                  value={formData.estateApartment?.apartmentNumber || ""}
+                  onChange={(e) =>
+                    handleChange(
+                      "estateApartment.apartmentNumber",
+                      e.target.value,
+                    )
+                  }
+                  className={errors.apartmentNumber ? "border-red-500" : ""}
+                />
+                {errors.apartmentNumber && (
+                  <p className="text-sm text-red-500">
+                    Apartment number is required
+                  </p>
+                )}
+              </div>
+            </>
+          )}
           {/* <AiDescriptionTabs /> */}
         </section>
       </form>
