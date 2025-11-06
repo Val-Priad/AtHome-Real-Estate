@@ -16,23 +16,66 @@ import {
 // ENUMS
 // ==========================
 
+export const regionEnum = pgEnum("REGION_CODE_ENUM", [
+  "Vinnytsia Region", // UA-05
+  "Volyn Region", // UA-07
+  "Dnipropetrovsk Region", // UA-12
+  "Donetsk Region", // UA-14
+  "Zhytomyr Region", // UA-18
+  "Zakarpattia Region", // UA-21
+  "Zaporizhzhia Region", // UA-23
+  "Ivano-Frankivsk Region", // UA-26
+  "Kyiv Region", // UA-32
+  "Kirovohrad Region", // UA-35
+  "Lviv Region", // UA-46
+  "Mykolaiv Region", // UA-48
+  "Odesa Region", // UA-51
+  "Poltava Region", // UA-53
+  "Rivne Region", // UA-56
+  "Sumy Region", // UA-59
+  "Ternopil Region", // UA-61
+  "Kharkiv Region", // UA-63
+  "Kherson Region", // UA-65
+  "Khmelnytskyi Region", // UA-68
+  "Cherkasy Region", // UA-71
+  "Chernihiv Region", // UA-74
+  "Chernivtsi Region", // UA-77
+  "Autonomous Republic of Crimea", // UA-43 (Autonomous Republic)
+  "Kyiv City", // UA-30 (City with Special Status)
+  "Sevastopol City", // UA-40 (City with Special Status)
+]);
+
+export const energyClassEnum = pgEnum("ENERGY_CLASS_ENUM", [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+]);
+
 export const operationTypeEnum = pgEnum("OPERATION_TYPE_ENUM", [
   "Sale",
   "Lease",
 ]);
+
 export const currencyEnum = pgEnum("CURRENCY_ENUM", ["USD", "EUR"]);
+
 export const priceUnitEnum = pgEnum("PRICE_UNIT_ENUM", [
-  "per_property",
-  "per_month",
-  "per_night",
-  "per_m2",
-  "per_m2_per_month",
-  "per_m2_per_day",
+  "per property",
+  "per month",
+  "per night",
+  "per m2",
+  "per m2 per month",
+  "per m2 per day",
 ]);
+
 export const estateCategoryEnum = pgEnum("ESTATE_CATEGORY_ENUM", [
   "Apartment",
   "House",
 ]);
+
 export const buildingConditionEnum = pgEnum("BUILDING_CONDITION_ENUM", [
   "Very good",
   "Good",
@@ -45,11 +88,13 @@ export const buildingConditionEnum = pgEnum("BUILDING_CONDITION_ENUM", [
   "After reconstruction",
   "Under reconstruction",
 ]);
+
 export const buildingTypeEnum = pgEnum("BUILDING_TYPE_ENUM", [
   "Panel",
   "Brick",
   "Other",
 ]);
+
 export const vicinityTypeEnum = pgEnum("VICINITY_TYPE_ENUM", [
   "Bus stop",
   "Train station",
@@ -61,23 +106,19 @@ export const vicinityTypeEnum = pgEnum("VICINITY_TYPE_ENUM", [
   "Kindergarten",
   "Supermarket",
   "Small shop",
-  "Restaurant / Pub",
+  "Restaurant, Pub",
   "Children's playground",
   "Metro",
 ]);
+
 export const userRoleEnum = pgEnum("USER_ROLE_ENUM", [
   "admin",
   "agent",
   "user",
 ]);
-export const mediaTypeEnum = pgEnum("MEDIA_TYPE_ENUM", [
-  "image",
-  "video",
-  "pdf",
-  "photo_360",
-  "document",
-  "floor plan",
-]);
+
+export const mediaTypeEnum = pgEnum("MEDIA_TYPE_ENUM", ["image", "video"]);
+
 export const advertSubtypeEnum = pgEnum("ADVERT_SUBTYPE_ENUM", [
   "1 studio",
   "1+1",
@@ -93,6 +134,7 @@ export const advertSubtypeEnum = pgEnum("ADVERT_SUBTYPE_ENUM", [
   "Atypical",
   "Room",
 ]);
+
 export const advertRoomCountEnum = pgEnum("ADVERT_ROOM_COUNT_ENUM", [
   "1",
   "2",
@@ -101,12 +143,31 @@ export const advertRoomCountEnum = pgEnum("ADVERT_ROOM_COUNT_ENUM", [
   "5+",
   "Atypical",
 ]);
+
 export const flatClassEnum = pgEnum("FLAT_CLASS_ENUM", [
   "Maisonette",
   "Loft",
   "Attic",
   "Single-story",
 ]);
+
+export const houseCategoryEnum = pgEnum("HOUSE_CATEGORY_ENUM", [
+  "Cottage",
+  "Monument/Other",
+  "Family house",
+  "Villa",
+  "Turnkey",
+  "Country house",
+  "Farmstead",
+  "Multi-generational house",
+]);
+
+export const houseTypeEnum = pgEnum("HOUSE_TYPE_ENUM", [
+  "Detached",
+  "Semi-detached",
+  "Terraced",
+]);
+
 export const waterHeatSourceEnum = pgEnum("WATER_HEAT_SOURCE_ENUM", [
   "Electric boiler",
   "Gas boiler",
@@ -114,6 +175,7 @@ export const waterHeatSourceEnum = pgEnum("WATER_HEAT_SOURCE_ENUM", [
   "Solar collector",
   "Other",
 ]);
+
 export const heatingSourceEnum = pgEnum("HEATING_SOURCE_ENUM", [
   "Gas boiler",
   "Electric boiler",
@@ -122,6 +184,7 @@ export const heatingSourceEnum = pgEnum("HEATING_SOURCE_ENUM", [
   "Heat pump",
   "Other",
 ]);
+
 export const heatingElementEnum = pgEnum("HEATING_ELEMENT_ENUM", [
   "Radiator",
   "Underfloor heating",
@@ -129,12 +192,14 @@ export const heatingElementEnum = pgEnum("HEATING_ELEMENT_ENUM", [
   "Heat pump",
   "Other",
 ]);
+
 export const waterEnum = pgEnum("WATER_ENUM", [
   "Hot water",
   "Cold water",
   "Well",
   "Other",
 ]);
+
 export const electricityEnum = pgEnum("ELECTRICITY_ENUM", [
   "120V",
   "220V",
@@ -143,21 +208,25 @@ export const electricityEnum = pgEnum("ELECTRICITY_ENUM", [
   "400V",
   "Other",
 ]);
+
 export const roadTypeEnum = pgEnum("ROAD_TYPE_ENUM", [
   "Asphalt",
   "Gravel",
   "No access road",
 ]);
+
 export const telecommunicationEnum = pgEnum("TELECOMMUNICATION_ENUM", [
   "Telephone",
   "Internet",
   "Satellite",
 ]);
+
 export const furnishedEnum = pgEnum("FURNISHED_ENUM", [
   "Yes",
   "No",
   "Partially",
 ]);
+
 export const internetConnectionEnum = pgEnum("INTERNET_CONNECTION_ENUM", [
   "None",
   "Fiber",
@@ -168,7 +237,9 @@ export const internetConnectionEnum = pgEnum("INTERNET_CONNECTION_ENUM", [
   "Mobile 5G",
   "Other",
 ]);
+
 export const phaseEnum = pgEnum("PHASE_ENUM", ["Single-phase", "Three-phase"]);
+
 export const circuitBreakerEnum = pgEnum("CIRCUIT_BREAKER_ENUM", [
   "20A",
   "25A",
@@ -211,35 +282,40 @@ export const estate = pgTable("estate", {
   id: serial("id").primaryKey(),
   sellerId: integer("seller_id").references(() => profile.id, {
     onDelete: "set null",
-  }),
+  }), // TODO search field for owner, could be null if owner is not registered
   brokerId: integer("broker_id").references(() => profile.id, {
     onDelete: "set null",
-  }),
-  operationType: operationTypeEnum("operation_type").notNull(),
-  category: estateCategoryEnum("category").notNull(),
-  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-  currency: currencyEnum("currency").notNull(),
-  priceUnit: priceUnitEnum("price_unit").notNull(),
-  city: text("city").notNull(),
-  street: text("street").notNull(),
-  regionCode: text("region_code").notNull(),
-  latitude: doublePrecision("latitude").notNull(),
-  longitude: doublePrecision("longitude").notNull(),
-  buildingCondition: buildingConditionEnum("building_condition").notNull(),
-  usableArea: integer("usable_area"),
-  totalFloorArea: integer("total_floor_area"),
-  readyDate: date("ready_date"),
-  costOfLiving: numeric("cost_of_living", { precision: 10, scale: 2 }),
-  commission: numeric("commission", { precision: 10, scale: 2 }),
-  refundableDeposit: numeric("refundable_deposit", { precision: 10, scale: 2 }),
-  commissionPaidByOwner: boolean("commission_paid_by_owner").default(false),
-  advertLifetime: integer("advert_lifetime").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  roadType: roadTypeEnum("road_type").notNull(),
-  furnished: furnishedEnum("furnished").notNull(),
-  easyAccess: boolean("easy_access").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  }), // TODO dropdown list of brokers is generated from profile with role 'agent'
+
+  category: estateCategoryEnum("category").notNull(), // dropdown
+  operationType: operationTypeEnum("operation_type").notNull(), // dropdown
+  buildingCondition: buildingConditionEnum("building_condition").notNull(), // dropdown
+  energyClass: energyClassEnum("energy_class").notNull(), // dropdown
+  usableArea: doublePrecision("usable_area"), // input field
+  totalFloorArea: doublePrecision("total_floor_area"), // input field
+  roadType: roadTypeEnum("road_type").notNull(), // dropdown
+  furnished: furnishedEnum("furnished").notNull(), //  dropdown
+  easyAccess: boolean("easy_access").notNull().default(false), // checkbox
+  readyDate: date("ready_date").notNull(), // date picker
+  advertLifetime: integer("advert_lifetime").notNull(), //  dropdown in days (7, 30, 90, 180, 365)
+  expiresAt: timestamp("expires_at").notNull(), // TODO automatically calculated not in ui
+
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(), // input field
+  currency: currencyEnum("currency").notNull(), // dropdown
+  priceUnit: priceUnitEnum("price_unit").notNull(), // dropdown
+  costOfLiving: numeric("cost_of_living", { precision: 10, scale: 2 }), //  input field
+  commission: numeric("commission", { precision: 10, scale: 2 }), //  input field
+  commissionPaidByOwner: boolean("commission_paid_by_owner").default(false), // checkbox
+  refundableDeposit: numeric("refundable_deposit", { precision: 10, scale: 2 }), // input field
+
+  city: text("city").notNull(), // input field
+  street: text("street").notNull(), // input field
+  regionCode: regionEnum("region").notNull(), // dropdown
+  latitude: doublePrecision("latitude").notNull(), //  input field
+  longitude: doublePrecision("longitude").notNull(), //  input field
+
+  createdAt: timestamp("created_at").defaultNow().notNull(), // TODO automatically set
+  updatedAt: timestamp("updated_at").defaultNow().notNull(), // TODO automatically set
 });
 
 // ==========================
@@ -250,17 +326,20 @@ export const estateApartment = pgTable("estate_apartment", {
   estateId: integer("estate_id")
     .primaryKey()
     .references(() => estate.id, { onDelete: "cascade" }),
-  balcony: boolean("balcony").notNull().default(false),
-  loggia: boolean("loggia").notNull().default(false),
-  terrace: boolean("terrace").notNull().default(false),
-  floorNumber: integer("floor_number"),
-  apartmentNumber: text("apartment_number"),
-  balconyArea: integer("balcony_area"),
-  loggiaArea: integer("loggia_area"),
-  terraceArea: integer("terrace_area"),
-  flatClass: flatClassEnum("flat_class"),
-  buildingType: buildingTypeEnum("building_type"),
-  advertSubtype: advertSubtypeEnum("advert_subtype"),
+  flatClass: flatClassEnum("flat_class"), // dropdown
+  buildingType: buildingTypeEnum("building_type"), // dropdown
+  advertSubtype: advertSubtypeEnum("advert_subtype"), // dropdown
+
+  floorNumber: integer("floor_number"), // input field
+  apartmentNumber: text("apartment_number"), // input field
+
+  garden: boolean("garden").notNull().default(false), //  checkbox
+  parking: boolean("parking").notNull().default(false), //  checkbox
+  elevator: boolean("elevator").notNull().default(false), //  checkbox
+
+  balconyArea: integer("balcony_area"), //  input field
+  loggiaArea: integer("loggia_area"), //  input field
+  terraceArea: integer("terrace_area"), //  input field
 });
 
 // ==========================
@@ -271,21 +350,27 @@ export const estateHouse = pgTable("estate_house", {
   estateId: integer("estate_id")
     .primaryKey()
     .references(() => estate.id, { onDelete: "cascade" }),
-  pool: boolean("pool").notNull().default(false),
-  floors: integer("floors"),
-  gardenArea: integer("garden_area"),
-  buildingArea: integer("building_area"),
-  cellar: boolean("cellar").notNull().default(false),
-  garage: boolean("garage").notNull().default(false),
-  parkingLotsCount: integer("parking_lots_count"),
-  undergroundFloors: integer("underground_floors"),
-  acceptanceYear: integer("acceptance_year"),
-  reconstructionYear: integer("reconstruction_year"),
-  pvPanels: boolean("pv_panels").notNull().default(false),
-  solarWaterHeating: boolean("solar_water_heating").notNull().default(false),
-  roomCount: advertRoomCountEnum("room_count"),
-  circuitBreaker: circuitBreakerEnum("circuit_breaker"),
-  phase: phaseEnum("phase"),
+  houseCategory: houseCategoryEnum("house_category"), // dropdown
+  roomCount: advertRoomCountEnum("room_count"), // dropdown
+  houseType: houseTypeEnum("house_type"), // dropdown
+  reconstructionYear: integer("reconstruction_year"), // input field
+  acceptanceYear: integer("acceptance_year"), // input field
+
+  floors: integer("floors"), // input field
+  undergroundFloors: integer("underground_floors"), // input field
+  parkingLotsCount: integer("parking_lots_count"), // input field
+
+  gardenArea: integer("garden_area"), // input field
+  buildingArea: integer("building_area"), // input field
+
+  circuitBreaker: circuitBreakerEnum("circuit_breaker"), // dropdown
+  phase: phaseEnum("phase"), // dropdown
+
+  pool: boolean("pool").notNull().default(false), //  checkbox
+  cellar: boolean("cellar").notNull().default(false), //  checkbox
+  garage: boolean("garage").notNull().default(false), //  checkbox
+  pvPanels: boolean("pv_panels").notNull().default(false), //  checkbox
+  solarWaterHeating: boolean("solar_water_heating").notNull().default(false), //  checkbox
 });
 
 // ==========================
@@ -298,9 +383,9 @@ export const estateTranslation = pgTable(
     estateId: integer("estate_id").references(() => estate.id, {
       onDelete: "cascade",
     }),
-    langCode: text("lang_code").notNull(),
-    title: text("title").notNull(),
-    description: text("description").notNull(),
+    langCode: text("lang_code").notNull(), // automatically set on ui
+    title: text("title").notNull(), // input field
+    description: text("description").notNull(), // input field
   },
   (table) => [primaryKey({ columns: [table.estateId, table.langCode] })],
 );
@@ -309,6 +394,7 @@ export const estateTranslation = pgTable(
 // MEDIA
 // ==========================
 
+// make only place for it with basic markup, actual media handling will be done later
 export const estateMedia = pgTable("estate_media", {
   id: serial("id").primaryKey(),
   estateId: integer("estate_id")
@@ -342,6 +428,7 @@ export const wishList = pgTable(
 // VICINITY
 // ==========================
 
+// will be collected automatically by api, simply make a button to fetch vicinity data, make it near the latitude/longitude fields
 export const estateVicinity = pgTable("estate_vicinity", {
   id: serial("id").primaryKey(),
   estateId: integer("estate_id")
@@ -358,6 +445,7 @@ export const estateVicinity = pgTable("estate_vicinity", {
 // MULTISELECT LINK TABLES
 // ==========================
 
+// checkbox group
 export const estateHeatingSource = pgTable(
   "estate_heating_source",
   {
@@ -369,6 +457,7 @@ export const estateHeatingSource = pgTable(
   (table) => [primaryKey({ columns: [table.estateId, table.heatingSource] })],
 );
 
+// checkbox group
 export const estateHeatingElement = pgTable(
   "estate_heating_element",
   {
@@ -380,6 +469,7 @@ export const estateHeatingElement = pgTable(
   (table) => [primaryKey({ columns: [table.estateId, table.heatingElement] })],
 );
 
+// checkbox group
 export const estateWaterHeating = pgTable(
   "estate_water_heating",
   {
@@ -391,6 +481,7 @@ export const estateWaterHeating = pgTable(
   (table) => [primaryKey({ columns: [table.estateId, table.waterHeatSource] })],
 );
 
+// checkbox group
 export const estateWater = pgTable(
   "estate_water",
   {
@@ -402,6 +493,7 @@ export const estateWater = pgTable(
   (table) => [primaryKey({ columns: [table.estateId, table.water] })],
 );
 
+// checkbox group
 export const estateElectricity = pgTable(
   "estate_electricity",
   {
@@ -413,6 +505,7 @@ export const estateElectricity = pgTable(
   (table) => [primaryKey({ columns: [table.estateId, table.electricity] })],
 );
 
+// checkbox group
 export const estateTelecommunication = pgTable(
   "estate_telecommunication",
   {
@@ -426,6 +519,7 @@ export const estateTelecommunication = pgTable(
   ],
 );
 
+// checkbox group
 export const estateInternet = pgTable(
   "estate_internet",
   {
