@@ -76,7 +76,7 @@ function Page() {
 
   function alertData() {
     const values = form.getValues();
-    alert(typeof values);
+    alert(JSON.stringify(values));
   }
 
   async function handleGenerate() {

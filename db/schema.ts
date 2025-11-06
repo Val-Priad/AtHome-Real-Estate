@@ -119,7 +119,7 @@ export const userRoleEnum = pgEnum("USER_ROLE_ENUM", [
 
 export const mediaTypeEnum = pgEnum("MEDIA_TYPE_ENUM", ["image", "video"]);
 
-export const advertSubtypeEnum = pgEnum("ADVERT_SUBTYPE_ENUM", [
+export const apartmentPlanEnum = pgEnum("ADVERT_SUBTYPE_ENUM", [
   "1 studio",
   "1+1",
   "2 studio",
@@ -135,7 +135,7 @@ export const advertSubtypeEnum = pgEnum("ADVERT_SUBTYPE_ENUM", [
   "Room",
 ]);
 
-export const advertRoomCountEnum = pgEnum("ADVERT_ROOM_COUNT_ENUM", [
+export const roomCountEnum = pgEnum("ADVERT_ROOM_COUNT_ENUM", [
   "1",
   "2",
   "3",
@@ -328,7 +328,7 @@ export const estateApartment = pgTable("estate_apartment", {
     .references(() => estate.id, { onDelete: "cascade" }),
   flatClass: flatClassEnum("flat_class"), // dropdown
   buildingType: buildingTypeEnum("building_type"), // dropdown
-  advertSubtype: advertSubtypeEnum("advert_subtype"), // dropdown
+  apartmentPlan: apartmentPlanEnum("advert_subtype"), // dropdown
 
   floorNumber: integer("floor_number"), // input field
   apartmentNumber: text("apartment_number"), // input field
@@ -351,7 +351,7 @@ export const estateHouse = pgTable("estate_house", {
     .primaryKey()
     .references(() => estate.id, { onDelete: "cascade" }),
   houseCategory: houseCategoryEnum("house_category"), // dropdown
-  roomCount: advertRoomCountEnum("room_count"), // dropdown
+  roomCount: roomCountEnum("room_count"), // dropdown
   houseType: houseTypeEnum("house_type"), // dropdown
   reconstructionYear: integer("reconstruction_year"), // input field
   acceptanceYear: integer("acceptance_year"), // input field

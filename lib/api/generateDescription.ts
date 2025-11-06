@@ -1,3 +1,4 @@
+"use server";
 type OpenAIErrorResponse = { error: { message?: string } };
 
 type OpenAIChatCompletionResponse = {
@@ -39,14 +40,15 @@ type OpenAIResponse = OpenAIChatCompletionResponse | OpenAIErrorResponse;
 
 async function generateDescription(
   estateObject: Record<string, unknown>,
-): Promise<{ en: string; ua: string }> {
+): Promise<{ ok: boolean; message?: string; en?: string; ua?: string }> {
   const apiKey = process.env.OPENAI_API_KEY;
 
-  if (!apiKey) {
-    throw new Error("OpenAI API key is not set in environment variables");
-  }
+  try {
+    if (!apiKey) {
+      throw new Error("OpenAI API key is not set in environment variables");
+    }
 
-  const prompt = `
+    const prompt = `
   You are a professional real estate copywriter. Generate an engaging, buyer-focused description for the following property:
 
   ${JSON.stringify(estateObject, null, 2)}
@@ -62,47 +64,53 @@ async function generateDescription(
   Keep the total output within approximately 1000 tokens.
   `;
 
-  console.log("Waiting for OpenAI response...");
+    console.log("Waiting for OpenAI response...");
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      max_tokens: 1500,
-    }),
-  });
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7,
+        max_tokens: 1500,
+      }),
+    });
 
-  const data: OpenAIResponse = await response.json();
+    const data: OpenAIResponse = await response.json();
 
-  if (!response.ok) {
-    if ("error" in data) {
-      throw new Error(
-        data.error.message ?? `Unknown error (status ${response.status})`,
-      );
+    if (!response.ok) {
+      if ("error" in data) {
+        throw new Error(
+          data.error.message ?? `Unknown error (status ${response.status})`,
+        );
+      }
+      throw new Error(`Unknown error (status ${response.status})`);
     }
-    throw new Error(`Unknown error (status ${response.status})`);
+
+    let content;
+    if ("choices" in data) {
+      content = data.choices?.[0]?.message?.content?.trim();
+    }
+
+    if (!content) {
+      throw new Error("No content returned from OpenAI");
+    }
+
+    const [enDescription = "", uaDescription = ""] = content
+      .split("---")
+      .map((s: string) => s.trim());
+
+    return { ok: true, en: enDescription, ua: uaDescription };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { ok: false, message: error.message };
+    }
+    return { ok: false, message: "Unexpected behavior, something went wrong" };
   }
-
-  let content;
-  if ("choices" in data) {
-    content = data.choices?.[0]?.message?.content?.trim();
-  }
-
-  if (!content) {
-    throw new Error("No content returned from OpenAI");
-  }
-
-  const [enDescription = "", uaDescription = ""] = content
-    .split("---")
-    .map((s: string) => s.trim());
-
-  return { en: enDescription, ua: uaDescription };
 }
 
 export default generateDescription;

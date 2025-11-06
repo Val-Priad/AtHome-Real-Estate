@@ -8,7 +8,6 @@ function BodyWrapper({
   children: React.ReactNode;
 }>) {
   const path = usePathname();
-  console.log(path);
   const isRoot = path === "/en" || path === "/ua";
   const bodyStyle = isRoot
     ? {

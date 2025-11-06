@@ -1,10 +1,10 @@
 import { getDictionary } from "@/get-dictionary";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "@/components/ui/Button";
 import { FaBuilding } from "react-icons/fa";
 import { FaHouseChimney } from "react-icons/fa6";
 import { Locale } from "@/i18n-config";
+import { Button } from "@/components/ui/button";
 
 export default async function Page(props: {
   params: Promise<{ lang: Locale }>;
@@ -30,24 +30,14 @@ export default async function Page(props: {
         </div>
         <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-6 md:gap-8 2xl:gap-10">
           <Link href={`/${lang}/search?property-type=apartment`}>
-            <Button
-              type="main"
-              icon={
-                <FaBuilding className="text-brand-6 sm:h-5 sm:w-5 2xl:h-7 2xl:w-7" />
-              }
-              icon_position="left"
-            >
+            <Button size="lg">
+              <FaBuilding />
               {t.buttons.apartments}
             </Button>
           </Link>
           <Link href={`/${lang}/search?property-type=house`}>
-            <Button
-              type="main"
-              icon={
-                <FaHouseChimney className="text-brand-6 sm:h-5 sm:w-5 2xl:h-7 2xl:w-7" />
-              }
-              icon_position="left"
-            >
+            <Button size="lg">
+              <FaHouseChimney />
               {t.buttons.houses}
             </Button>
           </Link>

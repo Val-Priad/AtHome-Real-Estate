@@ -11,12 +11,10 @@ import {
   regionEnum,
   houseCategoryEnum,
   houseTypeEnum,
-  advertRoomCountEnum,
   phaseEnum,
   circuitBreakerEnum,
   flatClassEnum,
   buildingTypeEnum,
-  advertSubtypeEnum,
   heatingSourceEnum,
   heatingElementEnum,
   waterHeatSourceEnum,
@@ -25,6 +23,9 @@ import {
   telecommunicationEnum,
   internetConnectionEnum,
   mediaTypeEnum,
+  roomCountEnum,
+  apartmentPlanEnum,
+  vicinityTypeEnum,
 } from "@/db/schema";
 
 export const estateSchema = z.object({
@@ -41,7 +42,7 @@ export const estateSchema = z.object({
   furnished: z.enum(furnishedEnum.enumValues, { error: "Required" }),
   currency: z.enum(currencyEnum.enumValues, { error: "Required" }),
   priceUnit: z.enum(priceUnitEnum.enumValues, { error: "Required" }),
-  regionCode: z.enum(regionEnum.enumValues, { error: "Required" }),
+  region: z.enum(regionEnum.enumValues, { error: "Required" }),
 
   usableArea: z.coerce.number().positive("Must be positive").optional(),
   totalFloorArea: z.coerce.number().positive("Must be positive").optional(),
@@ -83,7 +84,7 @@ export const estateSchema = z.object({
 
 export const estateHouseSchema = z.object({
   houseCategory: z.enum(houseCategoryEnum.enumValues).optional().nullable(),
-  roomCount: z.enum(advertRoomCountEnum.enumValues).optional().nullable(),
+  roomCount: z.enum(roomCountEnum.enumValues).optional().nullable(),
   houseType: z.enum(houseTypeEnum.enumValues).optional().nullable(),
   circuitBreaker: z.enum(circuitBreakerEnum.enumValues).optional().nullable(),
   phase: z.enum(phaseEnum.enumValues).optional().nullable(),
@@ -123,7 +124,7 @@ export const estateHouseSchema = z.object({
 export const estateApartmentSchema = z.object({
   flatClass: z.enum(flatClassEnum.enumValues).optional().nullable(),
   buildingType: z.enum(buildingTypeEnum.enumValues).optional().nullable(),
-  advertSubtype: z.enum(advertSubtypeEnum.enumValues).optional().nullable(),
+  apartmentPlan: z.enum(apartmentPlanEnum.enumValues).optional().nullable(),
 
   floorNumber: z.coerce.number().int().nonnegative().optional().nullable(),
   balconyArea: z.coerce.number().int().nonnegative().optional().nullable(),
@@ -137,7 +138,23 @@ export const estateApartmentSchema = z.object({
   elevator: z.boolean().default(false),
 });
 
-
+export const estateMultiSelectSchema = z.object({
+  estateHeatingSource: z.array(z.enum(heatingSourceEnum.enumValues)).optional(),
+  estateHeatingElement: z
+    .array(z.enum(heatingElementEnum.enumValues))
+    .optional(),
+  estateWaterHeatSource: z
+    .array(z.enum(waterHeatSourceEnum.enumValues))
+    .optional(),
+  estateWater: z.array(z.enum(waterEnum.enumValues)).optional(),
+  estateElectricity: z.array(z.enum(electricityEnum.enumValues)).optional(),
+  estateTelecommunication: z
+    .array(z.enum(telecommunicationEnum.enumValues))
+    .optional(),
+  estateInternetConnections: z
+    .array(z.enum(internetConnectionEnum.enumValues))
+    .optional(),
+});
 
 const textField = z.string().trim().min(1, "Required").max(255, "Too long");
 
@@ -163,13 +180,27 @@ const mediaSchema = z
   )
   .min(1, "At least one media item is required");
 
+export const vicinityItemSchema = z.object({
+  type: z.enum(vicinityTypeEnum.enumValues),
+  name: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  id: z.number(),
+  distanceM: z.number(),
+});
+
+export const vicinitySchema = z
+  .record(z.enum(vicinityTypeEnum.enumValues), z.array(vicinityItemSchema))
+  .optional();
+
 export const InsertFormSchema = z.object({
   estate: estateSchema,
   estateApartment: estateApartmentSchema,
   estateHouse: estateHouseSchema,
-  multiselect: ,
+  multiselect: estateMultiSelectSchema,
   translations: translationSchema,
   media: mediaSchema,
+  vicinity: vicinitySchema,
 });
 
 export type InsertFormSchema = z.infer<typeof InsertFormSchema>;
@@ -187,7 +218,7 @@ export const defaultInsertFormValues: InsertFormSchema = {
     furnished: furnishedEnum.enumValues[0],
     currency: currencyEnum.enumValues[0],
     priceUnit: priceUnitEnum.enumValues[0],
-    regionCode: regionEnum.enumValues[0],
+    region: regionEnum.enumValues[0],
 
     usableArea: 0,
     totalFloorArea: 0,
@@ -210,7 +241,7 @@ export const defaultInsertFormValues: InsertFormSchema = {
 
   estateHouse: {
     houseCategory: houseCategoryEnum.enumValues[0],
-    roomCount: advertRoomCountEnum.enumValues[0],
+    roomCount: roomCountEnum.enumValues[0],
     houseType: houseTypeEnum.enumValues[0],
     circuitBreaker: circuitBreakerEnum.enumValues[0],
     phase: phaseEnum.enumValues[0],
@@ -233,7 +264,7 @@ export const defaultInsertFormValues: InsertFormSchema = {
   estateApartment: {
     flatClass: flatClassEnum.enumValues[0],
     buildingType: buildingTypeEnum.enumValues[0],
-    advertSubtype: advertSubtypeEnum.enumValues[0],
+    apartmentPlan: apartmentPlanEnum.enumValues[0],
 
     floorNumber: 0,
     balconyArea: 0,
