@@ -36,24 +36,32 @@ import {
   internetConnectionEnum,
   telecommunicationEnum,
 } from "@/db/schema";
-import { FormCheckbox, FormInput, FormSelect } from "@/components/ui/form";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldSeparator,
 } from "@/components/ui/field";
 
 import dynamic from "next/dynamic";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import generateDescription from "@/lib/api/generateDescription";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
 });
 
 function Page() {
+  const [tabValue, setTabValue] = useState("ua");
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(InsertFormSchema),
     defaultValues: defaultInsertFormValues,
@@ -68,11 +76,29 @@ function Page() {
 
   function alertData() {
     const values = form.getValues();
-    alert(JSON.stringify(values, null, 2));
+    alert(typeof values);
+  }
+
+  async function handleGenerate() {
+    setIsGenerating(true);
+    const result = await generateDescription(form.getValues());
+    if (!result.ok) {
+      toast.error(result.message);
+    } else {
+      form.setValue("translations.description", {
+        ua: result.ua ?? "",
+        en: result.en ?? "",
+      });
+      toast.success("Description is generated successfully!");
+    }
+
+    setIsGenerating(false);
   }
 
   return (
     <div className="flex justify-center px-2">
+      <Toaster position="top-center" richColors />
+
       <button
         className="fixed top-4 right-4 bg-amber-400"
         onClick={() => alertData()}
@@ -348,308 +374,294 @@ function Page() {
               )}
             />
 
-            <FieldGroup>
-              <Controller
-                name="estate.usableArea"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Usable Area</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.totalFloorArea"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Total Floor Area
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.price"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Price</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.costOfLiving"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Cost of Living</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.commission"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Commission</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.refundableDeposit"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Refundable Deposit
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-
-            <FieldGroup>
-              <Controller
-                name="estate.easyAccess"
-                control={form.control}
-                render={({
-                  field: { value, onChange, ...field },
-                  fieldState,
-                }) => (
-                  <Field
-                    orientation="horizontal"
-                    data-invalid={fieldState.invalid}
-                  >
-                    <Checkbox
-                      {...field}
-                      id={field.name}
-                      onCheckedChange={onChange}
-                      checked={value}
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <FieldLabel htmlFor={field.name} className="font-normal">
-                      Easy Access
-                    </FieldLabel>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="estate.commissionPaidByOwner"
-                control={form.control}
-                render={({
-                  field: { value, onChange, ...field },
-                  fieldState,
-                }) => (
-                  <Field
-                    orientation="horizontal"
-                    data-invalid={fieldState.invalid}
-                  >
-                    <Checkbox
-                      {...field}
-                      id={field.name}
-                      onCheckedChange={onChange}
-                      checked={value}
-                      aria-invalid={fieldState.invalid}
-                    />
-                    <FieldLabel htmlFor={field.name} className="font-normal">
-                      Commission is Paid by Owner
-                    </FieldLabel>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-
-            <FieldGroup>
-              <Controller
-                control={form.control}
-                name="estate.readyDate"
-                render={({ field }) => (
-                  <ReadyDatePicker
-                    value={
-                      field.value ? new Date(field.value as Date) : undefined
-                    }
-                    onChange={(date) => field.onChange(date ?? undefined)}
+            <Controller
+              name="estate.usableArea"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Usable Area</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
                   />
-                )}
-              />
 
-              <Controller
-                name="estate.advertLifetime"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>
-                      Advert Lifetime
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
+            <Controller
+              name="estate.totalFloorArea"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Total Floor Area</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
 
-            <FieldGroup>
-              <Controller
-                name="estate.city"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>City</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as string}
-                    />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="estate.street"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Street</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as string}
-                    />
+            <Controller
+              name="estate.price"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Price</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-            <FieldGroup>
-              <Controller
-                name="estate.latitude"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Latitude</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
+            <Controller
+              name="estate.costOfLiving"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Cost of Living</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
-                name="estate.longitude"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Longitude</FieldLabel>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      aria-invalid={fieldState.invalid}
-                      value={field.value as number}
-                    />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
+            <Controller
+              name="estate.commission"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Commission</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="estate.refundableDeposit"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Refundable Deposit
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="estate.easyAccess"
+              control={form.control}
+              render={({
+                field: { value, onChange, ...field },
+                fieldState,
+              }) => (
+                <Field
+                  orientation="horizontal"
+                  data-invalid={fieldState.invalid}
+                >
+                  <Checkbox
+                    {...field}
+                    id={field.name}
+                    onCheckedChange={onChange}
+                    checked={value}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldLabel htmlFor={field.name} className="font-normal">
+                    Easy Access
+                  </FieldLabel>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="estate.commissionPaidByOwner"
+              control={form.control}
+              render={({
+                field: { value, onChange, ...field },
+                fieldState,
+              }) => (
+                <Field
+                  orientation="horizontal"
+                  data-invalid={fieldState.invalid}
+                >
+                  <Checkbox
+                    {...field}
+                    id={field.name}
+                    onCheckedChange={onChange}
+                    checked={value}
+                    aria-invalid={fieldState.invalid}
+                  />
+                  <FieldLabel htmlFor={field.name} className="font-normal">
+                    Commission is Paid by Owner
+                  </FieldLabel>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="estate.readyDate"
+              render={({ field }) => (
+                <ReadyDatePicker
+                  value={
+                    field.value ? new Date(field.value as Date) : undefined
+                  }
+                  onChange={(date) => field.onChange(date ?? undefined)}
+                />
+              )}
+            />
+
+            <Controller
+              name="estate.advertLifetime"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Advert Lifetime</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="estate.city"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>City</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as string}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="estate.street"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Street</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as string}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="estate.latitude"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Latitude</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="estate.longitude"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Longitude</FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    value={field.value as number}
+                  />
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
           </FieldGroup>
 
           {category === "Apartment" && (
@@ -773,67 +785,65 @@ function Page() {
                 )}
               />
 
-              <FieldGroup>
-                <Controller
-                  name="estateApartment.balconyArea"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Balcony Area</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as number}
-                      />
+              <Controller
+                name="estateApartment.balconyArea"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Balcony Area</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as number}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateApartment.loggiaArea"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Loggia Area</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as number}
-                      />
+              <Controller
+                name="estateApartment.loggiaArea"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Loggia Area</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as number}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateApartment.terraceArea"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Terrace Area</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as number}
-                      />
+              <Controller
+                name="estateApartment.terraceArea"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Terrace Area</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as number}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
               <Controller
                 name="estateApartment.apartmentNumber"
@@ -857,89 +867,87 @@ function Page() {
                 )}
               />
 
-              <FieldGroup>
-                <Controller
-                  name="estateApartment.garden"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Garden
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="estateApartment.parking"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Parking
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="estateApartment.elevator"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Elevator
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+              <Controller
+                name="estateApartment.garden"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Garden
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="estateApartment.parking"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Parking
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="estateApartment.elevator"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Elevator
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
             </FieldGroup>
           )}
 
@@ -1111,300 +1119,290 @@ function Page() {
                 )}
               />
 
-              <FieldGroup>
-                <Controller
-                  name="estateHouse.reconstructionYear"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Reconstruction Year
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+              <Controller
+                name="estateHouse.reconstructionYear"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Reconstruction Year
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateHouse.acceptanceYear"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Acceptance Year
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+              <Controller
+                name="estateHouse.acceptanceYear"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Acceptance Year
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-              <FieldGroup>
-                <Controller
-                  name="estateHouse.floors"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Floors</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+              <Controller
+                name="estateHouse.floors"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Floors</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateHouse.undergroundFloors"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Underground Floors
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+              <Controller
+                name="estateHouse.undergroundFloors"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Underground Floors
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-              <FieldGroup>
-                <Controller
-                  name="estateHouse.parkingLotsCount"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Parking Lots Count
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+              <Controller
+                name="estateHouse.parkingLotsCount"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Parking Lots Count
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="estateHouse.gardenArea"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>Garden Area</FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="estateHouse.gardenArea"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Garden Area</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="estateHouse.buildingArea"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor={field.name}>
-                        Building Area
-                      </FieldLabel>
-                      <Input
-                        {...field}
-                        id={field.name}
-                        aria-invalid={fieldState.invalid}
-                        value={field.value as string}
-                      />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="estateHouse.buildingArea"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Building Area</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      value={field.value as string}
+                    />
 
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-              <FieldGroup>
-                <Controller
-                  name="estateHouse.pool"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Pool
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+              <Controller
+                name="estateHouse.pool"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Pool
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateHouse.cellar"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Cellar
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+              <Controller
+                name="estateHouse.cellar"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Cellar
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateHouse.garage"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Garage
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+              <Controller
+                name="estateHouse.garage"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Garage
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-                <Controller
-                  name="estateHouse.pvPanels"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        PV Panels
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Controller
-                  name="estateHouse.solarWaterHeating"
-                  control={form.control}
-                  render={({
-                    field: { value, onChange, ...field },
-                    fieldState,
-                  }) => (
-                    <Field
-                      orientation="horizontal"
-                      data-invalid={fieldState.invalid}
-                    >
-                      <Checkbox
-                        {...field}
-                        id={field.name}
-                        onCheckedChange={onChange}
-                        checked={value}
-                        aria-invalid={fieldState.invalid}
-                      />
-                      <FieldLabel htmlFor={field.name} className="font-normal">
-                        Solar Water Heating
-                      </FieldLabel>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
+              <Controller
+                name="estateHouse.pvPanels"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      PV Panels
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="estateHouse.solarWaterHeating"
+                control={form.control}
+                render={({
+                  field: { value, onChange, ...field },
+                  fieldState,
+                }) => (
+                  <Field
+                    orientation="horizontal"
+                    data-invalid={fieldState.invalid}
+                  >
+                    <Checkbox
+                      {...field}
+                      id={field.name}
+                      onCheckedChange={onChange}
+                      checked={value}
+                      aria-invalid={fieldState.invalid}
+                    />
+                    <FieldLabel htmlFor={field.name} className="font-normal">
+                      Solar Water Heating
+                    </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
             </>
           )}
 
@@ -1754,12 +1752,119 @@ function Page() {
             />
           </FieldGroup>
 
-          <button
-            type="submit"
-            className="rounded bg-green-500 px-4 py-2 text-white"
-          >
-            Submit
-          </button>
+          <div className="space-y-3">
+            <Tabs
+              value={tabValue}
+              onValueChange={setTabValue}
+              className="w-full"
+            >
+              <TabsList className="mb-2 grid grid-cols-2">
+                <TabsTrigger value="ua">🇺🇦 Ukrainian</TabsTrigger>
+                <TabsTrigger value="en">🇬🇧 English</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="ua" className="space-y-3">
+                <Controller
+                  name="translations.title.ua"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Ukrainian Title
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        value={field.value as string}
+                        placeholder="Ukrainian title waits to be written..."
+                      />
+
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                <Controller
+                  name="translations.description.ua"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Ukrainian Description
+                      </FieldLabel>
+                      <Textarea
+                        {...field}
+                        value={field.value}
+                        rows={3}
+                        placeholder="Ukrainian description will appear here..."
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </TabsContent>
+
+              <TabsContent value="en" className="space-y-3">
+                <Controller
+                  name="translations.description.en"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        English Title
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                        value={field.value as string}
+                        placeholder="English title waits to be written..."
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="translations.description.en"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        English Description
+                      </FieldLabel>
+                      <Textarea
+                        {...field}
+                        value={field.value}
+                        rows={3}
+                        placeholder="English description will appear here..."
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </TabsContent>
+            </Tabs>
+
+            <Button
+              type="button"
+              disabled={isGenerating}
+              onClick={handleGenerate}
+              className="w-full"
+            >
+              {isGenerating ? "Generating..." : "Click to generate description"}
+            </Button>
+          </div>
+
+          <Button>Submit</Button>
         </div>
       </form>
     </div>
