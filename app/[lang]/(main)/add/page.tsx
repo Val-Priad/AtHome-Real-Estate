@@ -53,14 +53,17 @@ import { useState } from "react";
 import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { fetchVicinity } from "@/lib/api/poiLogic";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
 });
 
 function Page() {
-  const [tabValue, setTabValue] = useState("ua");
+  const [tabDescriptionValue, setTabDescriptionValue] = useState("ua");
+  const [tabVicinityValue, setTabVicinityValue] = useState("Closest");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSearchingVicinity, setIsSearchingVicinity] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(InsertFormSchema),
@@ -68,6 +71,7 @@ function Page() {
   });
 
   const category = form.watch("estate.category");
+  const vicinity = form.watch("vicinity");
 
   function onSubmit(values: z.infer<typeof InsertFormSchema>) {
     console.log("submission");
@@ -77,6 +81,24 @@ function Page() {
   function alertData() {
     const values = form.getValues();
     alert(JSON.stringify(values));
+  }
+
+  async function handleVicinitySearch() {
+    setIsSearchingVicinity(true);
+    const result = await fetchVicinity(
+      Number(form.getValues("estate.latitude")),
+      Number(form.getValues("estate.longitude")),
+    );
+
+    if (!result.ok) {
+      toast.error(result.message);
+    } else {
+      form.setValue("vicinity", result.data);
+      console.log(result);
+      toast.success("Vicinity data was fetched successfully!");
+    }
+
+    setIsSearchingVicinity(false);
   }
 
   async function handleGenerate() {
@@ -662,6 +684,67 @@ function Page() {
                 </Field>
               )}
             />
+
+            <Button
+              type="button"
+              onClick={handleVicinitySearch}
+              disabled={isSearchingVicinity}
+            >
+              {isSearchingVicinity ? (
+                <>Searching Vicinity</>
+              ) : (
+                <>Fetch Vicinity Data</>
+              )}
+            </Button>
+
+            {vicinity &&
+              Object.values(vicinity).some(
+                (places) => Array.isArray(places) && places.length > 0,
+              ) && (
+                <Tabs
+                  value={tabVicinityValue}
+                  onValueChange={setTabVicinityValue}
+                  className=""
+                >
+                  <div className="overflow-x-scroll">
+                    <TabsList className="">
+                      {(Object.keys(vicinity) as (keyof typeof vicinity)[]).map(
+                        (type) => (
+                          <TabsTrigger key={type} value={type as string}>
+                            {type}
+                          </TabsTrigger>
+                        ),
+                      )}
+                    </TabsList>
+                  </div>
+                  {(Object.keys(vicinity) as (keyof typeof vicinity)[]).map(
+                    (type) => (
+                      <TabsContent key={type} value={type as string}>
+                        <div className="max-h-[200px] overflow-y-auto p-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            {vicinity[type].map((place) => (
+                              <a
+                                key={place.id}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href={`https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}&zoom=19`}
+                                className="border-border bg-card hover:bg-accent hover:text-accent-foreground block rounded-lg border p-2 transition-colors"
+                              >
+                                <div className="flex justify-between text-sm">
+                                  <span className="truncate">{place.name}</span>
+                                  <span className="text-brand-6 whitespace-nowrap">
+                                    {place.distanceM} m
+                                  </span>
+                                </div>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      </TabsContent>
+                    ),
+                  )}
+                </Tabs>
+              )}
           </FieldGroup>
 
           {category === "Apartment" && (
@@ -1754,8 +1837,8 @@ function Page() {
 
           <div className="space-y-3">
             <Tabs
-              value={tabValue}
-              onValueChange={setTabValue}
+              value={tabDescriptionValue}
+              onValueChange={setTabDescriptionValue}
               className="w-full"
             >
               <TabsList className="mb-2 grid grid-cols-2">
@@ -1811,7 +1894,7 @@ function Page() {
 
               <TabsContent value="en" className="space-y-3">
                 <Controller
-                  name="translations.description.en"
+                  name="translations.title.en"
                   control={form.control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
