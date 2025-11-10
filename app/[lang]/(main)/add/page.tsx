@@ -35,6 +35,7 @@ import {
   waterEnum,
   internetConnectionEnum,
   telecommunicationEnum,
+  estate,
 } from "@/db/schema";
 import {
   Field,
@@ -54,6 +55,13 @@ import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { fetchVicinity } from "@/lib/api/poiLogic";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
+import { Plus, Star, X } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { formatErrors } from "./components/formatErrors";
+import { insertEstate } from "@/lib/actions/estate/addEstate";
+import { error } from "console";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
@@ -73,13 +81,25 @@ function Page() {
   const category = form.watch("estate.category");
   const vicinity = form.watch("vicinity");
 
-  function onSubmit(values: z.infer<typeof InsertFormSchema>) {
-    console.log("submission");
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof InsertFormSchema>) {
+    toast.promise(insertEstate(values), {
+      loading: "Saving estate...",
+      success: (data) => {
+        if (data.success) {
+          setTimeout(() => {}, 3000);
+          return `Estate created successfully! Redirecting...`;
+        } else {
+          if ("error" in data) return `Failed: ${data.error}`;
+        }
+      },
+      error: "Unexpected error occurred",
+    });
   }
 
   function alertData() {
     const values = form.getValues();
+    console.log(form.getValues().media);
+
     alert(JSON.stringify(values));
   }
 
@@ -128,7 +148,14 @@ function Page() {
         Show State
       </button>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(
+          (values) => {
+            onSubmit(values);
+          },
+          (errors) => {
+            toast.error(formatErrors(errors));
+          },
+        )}
         className="border-brand-6 w-full max-w-3xl space-y-4 rounded-t-2xl border bg-stone-100 px-4 py-4"
       >
         <div className="space-y-3">
@@ -755,11 +782,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Flat Class</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -788,11 +811,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Building Type</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -821,11 +840,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Apartment Plan</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1042,11 +1057,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>House Category</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1075,11 +1086,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Room Count</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1108,11 +1115,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>House Type</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1143,11 +1146,7 @@ function Page() {
                     <FieldLabel htmlFor={field.name}>
                       Circuit Breaker
                     </FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1175,11 +1174,7 @@ function Page() {
                 render={({ field: { onChange, ...field }, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor={field.name}>Phase</FieldLabel>
-                    <Select
-                      {...field}
-                      onValueChange={onChange}
-                      value={field.name}
-                    >
+                    <Select {...field} onValueChange={onChange}>
                       <SelectTrigger
                         aria-invalid={fieldState.invalid}
                         onBlur={field.onBlur}
@@ -1946,6 +1941,136 @@ function Page() {
               {isGenerating ? "Generating..." : "Click to generate description"}
             </Button>
           </div>
+
+          <Controller
+            name="media"
+            control={form.control}
+            render={({ field: { value = [], onChange }, fieldState }) => {
+              const handleFileUpload = (
+                e: React.ChangeEvent<HTMLInputElement>,
+              ) => {
+                const files = e.target.files;
+                if (!files?.length) return;
+
+                const newItems = Array.from(files).map((file) => {
+                  const isVideo = file.type.startsWith("video/");
+                  return {
+                    url: URL.createObjectURL(file),
+                    file,
+                    alt: file.name,
+                    type: isVideo ? "video" : "image",
+                    isMain: false,
+                  };
+                });
+
+                onChange([...value, ...newItems]);
+              };
+
+              const removeItem = (index: number) => {
+                onChange(value.filter((_, i) => i !== index));
+              };
+
+              const setMain = (index: number) => {
+                onChange(
+                  value.map((item, i) => ({
+                    ...item,
+                    isMain: i === index,
+                  })),
+                );
+              };
+
+              return (
+                <>
+                  <FieldLabel>Add media (photos or videos)</FieldLabel>
+                  <div className="grid grid-cols-3 gap-3">
+                    {value.map((item, index) => (
+                      <Card
+                        key={index}
+                        className={`relative overflow-hidden rounded-xl border transition ${
+                          item.isMain
+                            ? "border-primary ring-primary/50 ring-2"
+                            : "border-muted"
+                        }`}
+                      >
+                        <CardContent className="relative p-0">
+                          {item.type === "image" && item.url && (
+                            <Image
+                              src={item.url}
+                              alt={item.alt || "Uploaded image"}
+                              width={300}
+                              height={200}
+                              className="h-32 w-full object-cover"
+                            />
+                          )}
+                          {item.type === "video" && item.url && (
+                            <video
+                              src={item.url}
+                              className="h-32 w-full object-cover"
+                              controls
+                            />
+                          )}
+                          <div className="absolute top-2 right-2 flex flex-col gap-1">
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="destructive"
+                              onClick={() => removeItem(index)}
+                              className="h-7 w-7 rounded-full opacity-90 hover:opacity-100"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant={item.isMain ? "default" : "secondary"}
+                              onClick={() => setMain(index)}
+                              className="h-7 w-7 rounded-full opacity-90 hover:opacity-100"
+                              title="Set as main"
+                            >
+                              <Star
+                                className={`h-4 w-4 ${
+                                  item.isMain
+                                    ? "text-yellow-400"
+                                    : "text-muted-foreground"
+                                }`}
+                                fill={item.isMain ? "currentColor" : "none"}
+                              />
+                            </Button>
+                          </div>
+                        </CardContent>
+                        {item.isMain && (
+                          <div className="bg-primary/80 absolute bottom-1 left-1 rounded-md px-2 py-0.5 text-xs text-white">
+                            Main
+                          </div>
+                        )}
+                      </Card>
+                    ))}
+
+                    <Label
+                      htmlFor="media-upload"
+                      className="border-muted-foreground/30 text-muted-foreground hover:bg-muted/30 flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed"
+                    >
+                      <input
+                        id="media-upload"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp,.mp4"
+                        multiple
+                        className="hidden"
+                        onChange={handleFileUpload}
+                      />
+                      <Plus className="mb-1 h-6 w-6" />
+                      <span className="text-sm font-medium">
+                        Add photo or video
+                      </span>
+                    </Label>
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </>
+              );
+            }}
+          />
 
           <Button>Submit</Button>
         </div>
