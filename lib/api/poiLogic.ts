@@ -1,4 +1,6 @@
-import { haversineDistance } from "../utils/haversineDistance";
+"use server";
+import { vicinityTypeEnum } from "@/db/schema";
+import { haversineDistance } from "@/utils/haversineDistance";
 
 export type OSMElement = {
   type: "node";
@@ -19,7 +21,7 @@ export type OverpassAPIResponse = {
 };
 
 export type Place = {
-  type: string;
+  type: VicinityType;
   name: string;
   latitude: number;
   longitude: number;
@@ -43,30 +45,36 @@ const VICINITY_TYPES = [
   { osmKey: "railway", osmValue: "subway_entrance", type: "Metro" },
 ];
 
-export async function fetchVicinity(lat: number, lon: number, radius: number) {
-  if (!lat || !lon || !radius) {
-    console.error("ERROR: Latitude and longitude are required.");
-    return;
-  }
+export type VicinityType = (typeof vicinityTypeEnum.enumValues)[number];
 
-  const queries = VICINITY_TYPES.map(
-    ({ osmKey, osmValue }) =>
-      `node[${osmKey}=${osmValue}](around:${radius},${lat},${lon});`,
-  ).join("\n");
+export async function fetchVicinity(
+  lat: number,
+  lon: number,
+  radius: number = 10000,
+): Promise<{
+  ok: boolean;
+  data?: Record<VicinityType, Place[]>;
+  message?: string;
+}> {
+  try {
+    if (!lat || !lon || !radius) {
+      throw new Error("Latitude and longitude are required.");
+    }
 
-  const overpassQuery = `
+    const queries = VICINITY_TYPES.map(
+      ({ osmKey, osmValue }) =>
+        `node[${osmKey}=${osmValue}](around:${radius},${lat},${lon});`,
+    ).join("\n");
+
+    const overpassQuery = `
     [out:json];
     (
       ${queries}
     );
     out body;
   `;
+    console.log(overpassQuery);
 
-  console.log(
-    `Fetching vicinity data around lat=${lat}, lon=${lon}, radius=${radius}m...`,
-  );
-
-  try {
     const apiUrl = "https://overpass-api.de/api/interpreter";
 
     const response = await fetch(apiUrl, {
@@ -84,7 +92,6 @@ export async function fetchVicinity(lat: number, lon: number, radius: number) {
     }
 
     const data: OverpassAPIResponse = await response.json();
-    console.log("✅ Successful response from Overpass API.");
 
     const mappedElements = (data.elements || [])
       .map((el) => {
@@ -108,27 +115,22 @@ export async function fetchVicinity(lat: number, lon: number, radius: number) {
       })
       .filter((el): el is Place => Boolean(el));
 
-    const sortedPlacesInGroups = getSortedPlacesInGroups(
-      groupPlaces(mappedElements),
-    );
+    const sortedPlacesInGroups: Record<VicinityType, Place[]> =
+      getSortedPlacesInGroups(groupPlaces(mappedElements));
     const groupClosest = {
       Closest: getClosestPlacesFromEachGroup(sortedPlacesInGroups),
     };
 
-    const result = { ...sortedPlacesInGroups, ...groupClosest };
-
-    console.log(result);
-    return result;
+    return { ok: true, data: { ...sortedPlacesInGroups, ...groupClosest } };
   } catch (error) {
     if (error instanceof Error) {
-      console.error("\n❌ ERROR FETCHING VICINITY:", error.message);
-    } else {
-      console.error("\n❌ ERROR FETCHING VICINITY:", error);
+      return { ok: false, message: error.message };
     }
+    return { ok: false, message: "Unexpected Error" };
   }
 }
 
-export function groupPlaces(places: Place[]) {
+function groupPlaces(places: Place[]) {
   const groups: Record<string, Place[]> = {};
   for (const place of places) {
     if (!groups[place.type]) {
@@ -139,7 +141,7 @@ export function groupPlaces(places: Place[]) {
   return groups;
 }
 
-export function getSortedPlacesInGroups(groups: Record<string, Place[]>) {
+function getSortedPlacesInGroups(groups: Record<string, Place[]>) {
   const sortedGroups: Record<string, Place[]> = {};
   for (const [type, places] of Object.entries(groups)) {
     sortedGroups[type] = [...places].sort(
@@ -149,7 +151,7 @@ export function getSortedPlacesInGroups(groups: Record<string, Place[]>) {
   return sortedGroups;
 }
 
-export function getClosestPlacesFromEachGroup(groups: Record<string, Place[]>) {
+function getClosestPlacesFromEachGroup(groups: Record<string, Place[]>) {
   const closestPlaces: Place[] = [];
   for (const [, places] of Object.entries(groups)) {
     closestPlaces.push(

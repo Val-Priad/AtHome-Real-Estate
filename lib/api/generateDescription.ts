@@ -38,8 +38,14 @@ type OpenAIChatCompletionResponse = {
 
 type OpenAIResponse = OpenAIChatCompletionResponse | OpenAIErrorResponse;
 
+interface EstateObjectWithVicinity extends Record<string, unknown> {
+  vicinity?: {
+    Closest?: unknown[];
+  };
+}
+
 async function generateDescription(
-  estateObject: Record<string, unknown>,
+  estateObject: EstateObjectWithVicinity,
 ): Promise<{ ok: boolean; message?: string; en?: string; ua?: string }> {
   const apiKey = process.env.OPENAI_API_KEY;
 

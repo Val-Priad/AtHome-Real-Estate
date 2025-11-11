@@ -17,9 +17,13 @@ interface DatePickerProps {
   onChange: (date: Date | undefined) => void;
 }
 
-function ReadyDatePicker({ value, onChange }: DatePickerProps) {
+function DatePicker({ value, onChange }: DatePickerProps) {
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(value);
+
+  const today = new Date();
+  const nextYear = new Date();
+  nextYear.setFullYear(today.getFullYear() + 1);
 
   return (
     <div className="flex flex-col gap-3">
@@ -41,7 +45,9 @@ function ReadyDatePicker({ value, onChange }: DatePickerProps) {
           <Calendar
             mode="single"
             selected={date}
-            captionLayout="dropdown"
+            modifiers={{
+              disabled: { before: today, after: nextYear },
+            }}
             onSelect={(selectedDate) => {
               setDate(selectedDate);
               onChange(selectedDate);
@@ -54,4 +60,4 @@ function ReadyDatePicker({ value, onChange }: DatePickerProps) {
   );
 }
 
-export default ReadyDatePicker;
+export default DatePicker;

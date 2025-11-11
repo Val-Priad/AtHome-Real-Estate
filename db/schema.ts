@@ -106,9 +106,10 @@ export const vicinityTypeEnum = pgEnum("VICINITY_TYPE_ENUM", [
   "Kindergarten",
   "Supermarket",
   "Small shop",
-  "Restaurant, Pub",
+  "Restaurant / Pub",
   "Children's playground",
   "Metro",
+  "Closest",
 ]);
 
 export const userRoleEnum = pgEnum("USER_ROLE_ENUM", [
@@ -310,7 +311,7 @@ export const estate = pgTable("estate", {
 
   city: text("city").notNull(), // input field
   street: text("street").notNull(), // input field
-  regionCode: regionEnum("region").notNull(), // dropdown
+  region: regionEnum("region").notNull(), // dropdown
   latitude: doublePrecision("latitude").notNull(), //  input field
   longitude: doublePrecision("longitude").notNull(), //  input field
 

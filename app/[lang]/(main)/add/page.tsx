@@ -35,7 +35,6 @@ import {
   waterEnum,
   internetConnectionEnum,
   telecommunicationEnum,
-  estate,
 } from "@/db/schema";
 import {
   Field,
@@ -50,7 +49,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -61,17 +60,21 @@ import { Plus, Star, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { formatErrors } from "./components/formatErrors";
 import { insertEstate } from "@/lib/actions/estate/addEstate";
-import { error } from "console";
+import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
 });
 
 function Page() {
+  const MAX_VIDEO_SIZE_MB = 50;
+  const MAX_VIDEO_DURATION_SEC = 120;
+  const MAX_IMAGE_SIZE_MB = 10;
   const [tabDescriptionValue, setTabDescriptionValue] = useState("ua");
   const [tabVicinityValue, setTabVicinityValue] = useState("Closest");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSearchingVicinity, setIsSearchingVicinity] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(InsertFormSchema),
@@ -82,18 +85,105 @@ function Page() {
   const vicinity = form.watch("vicinity");
 
   async function onSubmit(values: z.infer<typeof InsertFormSchema>) {
-    toast.promise(insertEstate(values), {
-      loading: "Saving estate...",
-      success: (data) => {
-        if (data.success) {
-          setTimeout(() => {}, 3000);
-          return `Estate created successfully! Redirecting...`;
-        } else {
-          if ("error" in data) return `Failed: ${data.error}`;
+    await toast.promise(
+      new Promise(async (resolve, reject) => {
+        try {
+          setIsSubmitting(true);
+          const uploadedItems = await uploadFilesToS3();
+
+          const dataToSubmit = { ...values, media: uploadedItems };
+
+          const response = await insertEstate(dataToSubmit);
+
+          setIsSubmitting(false);
+          if (response.success) {
+            resolve("Estate created successfully! Redirecting...");
+          } else if ("error" in response) {
+            reject(`Failed: ${response.error}`);
+          } else {
+            reject("Unknown error");
+          }
+        } catch (err) {
+          console.error(err);
+          setIsSubmitting(false);
+          reject("Upload or save failed");
         }
+      }),
+      {
+        loading: "Uploading files & saving estate...",
+        success: (message) => message as ReactNode,
+        error: (err) => err || "Unexpected error occurred",
       },
-      error: "Unexpected error occurred",
-    });
+    );
+  }
+
+  async function uploadFilesToS3() {
+    const allMedia = form.getValues("media");
+
+    const uploadedItems: {
+      url: string;
+      type: "image" | "video";
+      alt?: string;
+      isMain: boolean;
+    }[] = [];
+
+    for (const mediaItem of allMedia) {
+      try {
+        if (!mediaItem.file) {
+          uploadedItems.push({
+            url: mediaItem.url,
+            type: mediaItem.type as "image" | "video",
+            alt: mediaItem.alt,
+            isMain: mediaItem.isMain ?? false,
+          });
+          continue;
+        }
+
+        const { uploadUrl, publicUrl } = await getS3PresignedUrl(
+          mediaItem.file.name,
+          mediaItem.file.type,
+        );
+
+        if (!uploadUrl || !publicUrl) {
+          throw new Error("Failed to get S3 presigned URL");
+        }
+
+        const response = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": mediaItem.file.type },
+          body: mediaItem.file,
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `S3 upload failed with status ${response.status} (${response.statusText})`,
+          );
+        }
+
+        uploadedItems.push({
+          url: publicUrl,
+          type: mediaItem.type as "image" | "video",
+          alt: mediaItem.alt,
+          isMain: mediaItem.isMain ?? false,
+        });
+      } catch (error) {
+        console.error("Error uploading media item:", mediaItem, error);
+
+        if (error instanceof Error) {
+          toast.error(
+            `Failed to upload ${mediaItem.file?.name || "media"}: ${error.message}`,
+          );
+        } else {
+          toast.error(
+            `Unknown error while uploading ${mediaItem.file?.name || "media"}`,
+          );
+        }
+
+        throw error;
+      }
+    }
+
+    return uploadedItems;
   }
 
   function alertData() {
@@ -123,7 +213,15 @@ function Page() {
 
   async function handleGenerate() {
     setIsGenerating(true);
-    const result = await generateDescription(form.getValues());
+    const estateObject = form.getValues();
+    const filteredObject = {
+      ...estateObject,
+      vicinity: {
+        Closest: estateObject.vicinity?.Closest ?? [],
+      },
+      media: {},
+    };
+    const result = await generateDescription(filteredObject);
     if (!result.ok) {
       toast.error(result.message);
     } else {
@@ -1946,24 +2044,74 @@ function Page() {
             name="media"
             control={form.control}
             render={({ field: { value = [], onChange }, fieldState }) => {
-              const handleFileUpload = (
+              const handleFileUpload = async (
                 e: React.ChangeEvent<HTMLInputElement>,
               ) => {
                 const files = e.target.files;
                 if (!files?.length) return;
 
-                const newItems = Array.from(files).map((file) => {
+                const validItems: typeof value = [];
+
+                for (const file of Array.from(files)) {
                   const isVideo = file.type.startsWith("video/");
-                  return {
+                  const isImage = file.type.startsWith("image/");
+
+                  const fileSizeMB = file.size / (1024 * 1024);
+                  if (isVideo && fileSizeMB > MAX_VIDEO_SIZE_MB) {
+                    toast.error(
+                      `Video "${file.name}" is too large. Max size is ${MAX_VIDEO_SIZE_MB}MB.`,
+                    );
+                    continue;
+                  }
+
+                  if (isImage && fileSizeMB > MAX_IMAGE_SIZE_MB) {
+                    toast.error(
+                      `Image "${file.name}" is too large. Max size is ${MAX_IMAGE_SIZE_MB}MB.`,
+                    );
+                    continue;
+                  }
+
+                  if (isVideo) {
+                    const durationOk = await new Promise<boolean>((resolve) => {
+                      const videoEl = document.createElement("video");
+                      videoEl.preload = "metadata";
+
+                      videoEl.onloadedmetadata = () => {
+                        URL.revokeObjectURL(videoEl.src);
+                        const duration = videoEl.duration;
+                        resolve(duration <= MAX_VIDEO_DURATION_SEC);
+                      };
+
+                      videoEl.onerror = () => {
+                        toast.error(`Failed to read video "${file.name}".`);
+                        resolve(false);
+                      };
+
+                      videoEl.src = URL.createObjectURL(file);
+                    });
+
+                    if (!durationOk) {
+                      toast.error(
+                        `Video "${file.name}" is too long. Max duration is ${MAX_VIDEO_DURATION_SEC / 60} minutes.`,
+                      );
+                      continue;
+                    }
+                  }
+
+                  validItems.push({
                     url: URL.createObjectURL(file),
                     file,
                     alt: file.name,
                     type: isVideo ? "video" : "image",
                     isMain: false,
-                  };
-                });
+                  });
+                }
 
-                onChange([...value, ...newItems]);
+                if (validItems.length > 0) {
+                  onChange([...value, ...validItems]);
+                }
+
+                e.target.value = "";
               };
 
               const removeItem = (index: number) => {
@@ -2072,7 +2220,9 @@ function Page() {
             }}
           />
 
-          <Button>Submit</Button>
+          <Button className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
       </form>
     </div>

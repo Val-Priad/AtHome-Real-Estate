@@ -83,36 +83,29 @@ export const estateSchema = z.object({
 });
 
 export const estateHouseSchema = z.object({
-  houseCategory: z.enum(houseCategoryEnum.enumValues).optional().nullable(),
-  roomCount: z.enum(roomCountEnum.enumValues).optional().nullable(),
-  houseType: z.enum(houseTypeEnum.enumValues).optional().nullable(),
-  circuitBreaker: z.enum(circuitBreakerEnum.enumValues).optional().nullable(),
-  phase: z.enum(phaseEnum.enumValues).optional().nullable(),
+  houseCategory: z.enum(houseCategoryEnum.enumValues).optional(),
+  roomCount: z.enum(roomCountEnum.enumValues).optional(),
+  houseType: z.enum(houseTypeEnum.enumValues).optional(),
+  circuitBreaker: z.enum(circuitBreakerEnum.enumValues).optional(),
+  phase: z.enum(phaseEnum.enumValues).optional(),
 
   reconstructionYear: z.coerce
     .number()
     .int("Must be an integer")
     .min(1000, "Invalid year")
     .max(new Date().getFullYear(), "Cannot be in the future")
-    .optional()
-    .nullable(),
+    .optional(),
   acceptanceYear: z.coerce
     .number()
     .int("Must be an integer")
     .min(1000, "Invalid year")
     .max(new Date().getFullYear(), "Cannot be in the future")
-    .optional()
-    .nullable(),
-  floors: z.coerce.number().int().nonnegative().optional().nullable(),
-  undergroundFloors: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .optional()
-    .nullable(),
-  parkingLotsCount: z.coerce.number().int().nonnegative().optional().nullable(),
-  gardenArea: z.coerce.number().int().nonnegative().optional().nullable(),
-  buildingArea: z.coerce.number().int().nonnegative().optional().nullable(),
+    .optional(),
+  floors: z.coerce.number().int().nonnegative().optional(),
+  undergroundFloors: z.coerce.number().int().nonnegative().optional(),
+  parkingLotsCount: z.coerce.number().int().nonnegative().optional(),
+  gardenArea: z.coerce.number().int().nonnegative().optional(),
+  buildingArea: z.coerce.number().int().nonnegative().optional(),
 
   pool: z.boolean().default(false),
   cellar: z.boolean().default(false),
@@ -122,16 +115,16 @@ export const estateHouseSchema = z.object({
 });
 
 export const estateApartmentSchema = z.object({
-  flatClass: z.enum(flatClassEnum.enumValues).optional().nullable(),
-  buildingType: z.enum(buildingTypeEnum.enumValues).optional().nullable(),
-  apartmentPlan: z.enum(apartmentPlanEnum.enumValues).optional().nullable(),
+  flatClass: z.enum(flatClassEnum.enumValues).optional(),
+  buildingType: z.enum(buildingTypeEnum.enumValues).optional(),
+  apartmentPlan: z.enum(apartmentPlanEnum.enumValues).optional(),
 
-  floorNumber: z.coerce.number().int().nonnegative().optional().nullable(),
-  balconyArea: z.coerce.number().int().nonnegative().optional().nullable(),
-  loggiaArea: z.coerce.number().int().nonnegative().optional().nullable(),
-  terraceArea: z.coerce.number().int().nonnegative().optional().nullable(),
+  floorNumber: z.coerce.number().int().nonnegative().optional(),
+  balconyArea: z.coerce.number().int().nonnegative().optional(),
+  loggiaArea: z.coerce.number().int().nonnegative().optional(),
+  terraceArea: z.coerce.number().int().nonnegative().optional(),
 
-  apartmentNumber: z.string().trim().max(255, "Too long").optional().nullable(),
+  apartmentNumber: z.string().trim().max(255, "Too long").optional(),
 
   garden: z.boolean().default(false),
   parking: z.boolean().default(false),
@@ -173,12 +166,14 @@ const mediaSchema = z
   .array(
     z.object({
       url: z.url(),
+      file: z.file().optional(),
       type: z.enum(mediaTypeEnum.enumValues),
-      alt: z.string().max(255).optional().nullable(),
+      alt: z.string().max(255).optional(),
       isMain: z.boolean().default(false),
     }),
   )
-  .min(1, "At least one media item is required");
+  .min(1, "At least one media item is required")
+  .max(10, "To many images/videos");
 
 export const vicinityItemSchema = z.object({
   type: z.enum(vicinityTypeEnum.enumValues),
@@ -205,10 +200,11 @@ export const InsertFormSchema = z.object({
 
 export type InsertFormSchema = z.infer<typeof InsertFormSchema>;
 
+// media missing from the type and it's completely fine
 export const defaultInsertFormValues: InsertFormSchema = {
   estate: {
-    sellerId: 0,
-    brokerId: 0,
+    // sellerId: 0,
+    // brokerId: 0,
 
     category: estateCategoryEnum.enumValues[0],
     operationType: operationTypeEnum.enumValues[0],
@@ -235,8 +231,8 @@ export const defaultInsertFormValues: InsertFormSchema = {
 
     city: "",
     street: "",
-    latitude: 0,
-    longitude: 0,
+    latitude: 50.388868,
+    longitude: 30.464982,
   },
 
   estateHouse: {
@@ -246,8 +242,8 @@ export const defaultInsertFormValues: InsertFormSchema = {
     circuitBreaker: circuitBreakerEnum.enumValues[0],
     phase: phaseEnum.enumValues[0],
 
-    reconstructionYear: 0,
-    acceptanceYear: 0,
+    reconstructionYear: new Date().getFullYear(),
+    acceptanceYear: new Date().getFullYear(),
     floors: 0,
     undergroundFloors: 0,
     parkingLotsCount: 0,
@@ -279,28 +275,19 @@ export const defaultInsertFormValues: InsertFormSchema = {
   },
 
   multiselect: {
-    estateHeatingSource: [heatingSourceEnum.enumValues[0]],
-    estateHeatingElement: [heatingElementEnum.enumValues[0]],
-    estateWaterHeatSource: [waterHeatSourceEnum.enumValues[0]],
-    estateWater: [waterEnum.enumValues[0]],
-    estateElectricity: [electricityEnum.enumValues[0]],
-    estateTelecommunication: [telecommunicationEnum.enumValues[0]],
-    estateInternetConnections: [internetConnectionEnum.enumValues[0]],
+    estateHeatingSource: [],
+    estateHeatingElement: [],
+    estateWaterHeatSource: [],
+    estateWater: [],
+    estateElectricity: [],
+    estateTelecommunication: [],
+    estateInternetConnections: [],
   },
 
   translations: {
     description: { ua: "", en: "" },
     title: { ua: "", en: "" },
   },
-
-  media: [
-    {
-      url: "",
-      type: mediaTypeEnum.enumValues[0],
-      alt: "",
-      isMain: false,
-    },
-  ],
 };
 
 export type InsertFormType = z.infer<typeof InsertFormSchema>;
