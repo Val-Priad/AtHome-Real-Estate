@@ -26,12 +26,6 @@
   --text-caption: 0.62rem;
 }
 
-/* TODO */
-/* font family inter */
-/* @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap"); */
-/* Test on pixelify */
-/* 
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -137,9 +131,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-} */
-
-:root {
+}
+*/ :root {
   --background: oklch(0.99 0.01 240);
   --foreground: oklch(0.2 0.01 14.6);
   --card: oklch(1 0 0);
@@ -327,4 +320,15 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.bg-home {
+  background-image: url("/villa_20.webp");
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100dvh;
 }

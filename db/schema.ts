@@ -1,3 +1,5 @@
+import type { AdapterAccountType } from "@auth/core/adapters";
+
 import {
   pgEnum,
   pgTable,
@@ -252,27 +254,89 @@ export const circuitBreakerEnum = pgEnum("CIRCUIT_BREAKER_ENUM", [
 // USERS / BROKERS
 // ==========================
 
-export const profile = pgTable("profile", {
-  id: serial("id").primaryKey(),
-  role: userRoleEnum("role").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
+export const users = pgTable("user", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+
+  name: text("name"),
+  email: text("email").notNull().unique(),
+  emailVerified: timestamp("email_verified", { mode: "date" }),
+  image: text("image"),
+
+  passwordHash: text("password_hash").notNull(),
   phoneNumber: text("phone_number"),
   description: text("description"),
-  photoUrl: text("photo_url"),
+  role: userRoleEnum("role").notNull().default("user"),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const userAuth = pgTable("user_auth", {
-  userId: integer("user_id")
-    .primaryKey()
-    .references(() => profile.id, { onDelete: "cascade" }),
-  email: text("email").notNull().unique(),
+// ---------- ACCOUNTS ----------
+export const accounts = pgTable(
+  "account",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").$type<AdapterAccountType>().notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (account) => [
+    primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+  ],
+);
+
+// ---------- SESSIONS ----------
+export const sessions = pgTable("session", {
+  sessionToken: text("session_token").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
+
+// ---------- AUTHENTICATORS (для WebAuthn) ----------
+export const authenticators = pgTable(
+  "authenticator",
+  {
+    credentialID: text("credential_id").notNull().unique(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    providerAccountId: text("provider_account_id").notNull(),
+    credentialPublicKey: text("credential_public_key").notNull(),
+    counter: integer("counter").notNull(),
+    credentialDeviceType: text("credential_device_type").notNull(),
+    credentialBackedUp: boolean("credential_backed_up").notNull(),
+    transports: text("transports"),
+  },
+  (authenticator) => [
+    primaryKey({
+      columns: [authenticator.userId, authenticator.credentialID],
+    }),
+  ],
+);
+
+export const emailVerifications = pgTable("email_verification", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
   passwordHash: text("password_hash").notNull(),
-  isVerified: boolean("is_verified").notNull().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 });
 
 // ==========================
@@ -281,10 +345,10 @@ export const userAuth = pgTable("user_auth", {
 
 export const estate = pgTable("estate", {
   id: serial("id").primaryKey(),
-  sellerId: integer("seller_id").references(() => profile.id, {
+  sellerId: text("seller_id").references(() => users.id, {
     onDelete: "set null",
   }), // TODO search field for owner, could be null if owner is not registered
-  brokerId: integer("broker_id").references(() => profile.id, {
+  brokerId: text("broker_id").references(() => users.id, {
     onDelete: "set null",
   }), // TODO dropdown list of brokers is generated from profile with role 'agent'
 
@@ -415,7 +479,7 @@ export const estateMedia = pgTable("estate_media", {
 export const wishList = pgTable(
   "wish_list",
   {
-    userId: integer("user_id").references(() => profile.id, {
+    userId: text("user_id").references(() => users.id, {
       onDelete: "cascade",
     }),
     estateId: integer("estate_id").references(() => estate.id, {

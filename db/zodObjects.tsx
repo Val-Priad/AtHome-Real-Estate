@@ -288,6 +288,28 @@ export const defaultInsertFormValues: InsertFormSchema = {
     description: { ua: "", en: "" },
     title: { ua: "", en: "" },
   },
+
+  media: [
+    {
+      url: "",
+      type: "image",
+      isMain: false,
+      file: undefined,
+      alt: undefined,
+    },
+  ],
 };
 
 export type InsertFormType = z.infer<typeof InsertFormSchema>;
+
+export const authSchema = z.object({
+  email: z.email("Enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export const authSchemaDefault = {
+  email: "",
+  password: "",
+};
+
+export type AuthFormValues = z.infer<typeof authSchema>;

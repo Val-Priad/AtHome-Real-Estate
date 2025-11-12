@@ -53,7 +53,7 @@ import { ReactNode, useState } from "react";
 import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { fetchVicinity } from "@/lib/api/poiLogic";
+import { fetchVicinity } from "@/lib/api/fetchVicinity";
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Plus, Star, X } from "lucide-react";

@@ -10,37 +10,24 @@ import {
   useState,
 } from "react";
 import {
-  CAMEL_ARRAY_FIELDS,
   VICINITY_FEATURE_OPTIONS,
-  FEATURES_IN_THE_VICINITY,
-  FLOOR_PLAN,
   FLOOR_PLAN_OPTIONS,
-  CONDITION,
   CONDITION_OPTIONS,
   APARTMENT_ACCESSORY_OPTIONS,
-  ACCESSORIES,
-  ENERGY_CLASS,
   ENERGY_CLASS_OPTIONS,
-  OFFER_TYPE,
   OFFER_TYPE_OPTIONS,
-  HOUSE_CATEGORY,
   HOUSE_CATEGORY_OPTIONS,
-  HOUSE_SIZE,
   HOUSE_SIZE_OPTIONS,
   HOUSE_ACCESSORY_OPTIONS,
-  BUILDING_MATERIAL,
   BUILDING_MATERIAL_OPTIONS,
   VICINITY_OPTIONS,
   REGION_OPTIONS,
-  DISTANCE_TO_FACILITIES,
   REGION,
-  toSnakeCase,
-  SMART_SEARCH,
 } from "./components/options";
 import Section from "./components/Section";
 import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
 import FromToSection from "./components/FromToSection";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/myButton";
 import SectionWithDropdown from "./components/SectionWithDropdown";
 import Map from "./components/Map";
 import SectionWithTextarea from "./components/SectionWithTextarea";
@@ -240,14 +227,14 @@ function Page() {
         </Section>
 
         <SectionWithCheckboxes
-          sectionName={REGION}
+          sectionName="Region"
           handleInputChange={handleInputChange}
           isChecked={isChecked}
           options={REGION_OPTIONS}
         />
 
         <SectionWithCheckboxes
-          sectionName={OFFER_TYPE}
+          sectionName="Offer Type"
           handleInputChange={handleInputChange}
           isChecked={isChecked}
           options={OFFER_TYPE_OPTIONS}
@@ -255,7 +242,7 @@ function Page() {
 
         {propertyType === "apartment" && (
           <SectionWithCheckboxes
-            sectionName={FLOOR_PLAN}
+            sectionName="Floor Plan"
             handleInputChange={handleInputChange}
             isChecked={isChecked}
             options={FLOOR_PLAN_OPTIONS}
@@ -265,13 +252,13 @@ function Page() {
         {propertyType === "house" && (
           <>
             <SectionWithCheckboxes
-              sectionName={HOUSE_CATEGORY}
+              sectionName="House Category"
               handleInputChange={handleInputChange}
               isChecked={isChecked}
               options={HOUSE_CATEGORY_OPTIONS}
             />
             <SectionWithCheckboxes
-              sectionName={HOUSE_SIZE}
+              sectionName="House Size"
               handleInputChange={handleInputChange}
               isChecked={isChecked}
               options={HOUSE_SIZE_OPTIONS}
@@ -311,7 +298,7 @@ function Page() {
         />
 
         <SectionWithCheckboxes
-          sectionName={CONDITION}
+          sectionName="Condition"
           handleInputChange={handleInputChange}
           isChecked={isChecked}
           options={CONDITION_OPTIONS}
@@ -319,7 +306,7 @@ function Page() {
 
         {propertyType === "apartment" && (
           <SectionWithCheckboxes
-            sectionName={BUILDING_MATERIAL}
+            sectionName="Building Material"
             handleInputChange={handleInputChange}
             isChecked={isChecked}
             options={BUILDING_MATERIAL_OPTIONS}
@@ -328,7 +315,7 @@ function Page() {
 
         {propertyType === "apartment" && (
           <SectionWithCheckboxes
-            sectionName={ACCESSORIES}
+            sectionName="Accessories"
             options={APARTMENT_ACCESSORY_OPTIONS}
             handleInputChange={handleInputChange}
             isChecked={isChecked}
@@ -337,7 +324,7 @@ function Page() {
 
         {propertyType === "house" && (
           <SectionWithCheckboxes
-            sectionName={ACCESSORIES}
+            sectionName="Accessories"
             options={HOUSE_ACCESSORY_OPTIONS}
             handleInputChange={handleInputChange}
             isChecked={isChecked}
@@ -345,27 +332,27 @@ function Page() {
         )}
 
         <SectionWithDropdown
-          sectionName={DISTANCE_TO_FACILITIES}
+          sectionName="Distance to Facilities"
           options={VICINITY_OPTIONS}
           handleSelectChange={handleSelectChange}
         />
 
         <SectionWithCheckboxes
-          sectionName={FEATURES_IN_THE_VICINITY}
+          sectionName="Near the Apartments"
           handleInputChange={handleInputChange}
           isChecked={isChecked}
           options={VICINITY_FEATURE_OPTIONS}
         />
 
         <SectionWithCheckboxes
-          sectionName={ENERGY_CLASS}
+          sectionName={"Energy Class"}
           handleInputChange={handleInputChange}
           isChecked={isChecked}
           options={ENERGY_CLASS_OPTIONS}
         />
 
         <SectionWithTextarea
-          sectionName={SMART_SEARCH}
+          sectionName={"Smart Search"}
           handleTextareaChange={handleTextareaChange}
         />
 

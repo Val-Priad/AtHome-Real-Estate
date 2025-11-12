@@ -1,44 +1,36 @@
-import { getDictionary } from "@/get-dictionary";
 import Image from "next/image";
 import Link from "next/link";
 import { FaBuilding } from "react-icons/fa";
 import { FaHouseChimney } from "react-icons/fa6";
-import { Locale } from "@/i18n-config";
 import { Button } from "@/components/ui/button";
 
-export default async function Page(props: {
-  params: Promise<{ lang: Locale }>;
-}) {
-  const { lang } = await props.params;
-  const dict = await getDictionary(lang);
-  const t = dict.home;
-
+export default function Page() {
   return (
-    <main className="flex items-center justify-center">
+    <main className="bg-home flex items-center justify-center">
       <div className="flex w-50 flex-col sm:w-60 lg:w-66 xl:w-80 2xl:w-100">
         <div className="mb-5 flex flex-col items-center justify-center gap-1 2xl:mb-10">
           <Image
             src="/logo_big.webp"
-            alt={t.alt.logo}
+            alt="Company logo"
             width={346}
             height={404}
             className="h-auto w-full"
           />
           <p className="text-body 2xl:text-h5 text-brand-10 text-center">
-            {t.subtitle}
+            Choose from 99,186 real estate offers
           </p>
         </div>
         <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-6 md:gap-8 2xl:gap-10">
-          <Link href={`/${lang}/search?property-type=apartment`}>
-            <Button size="lg">
+          <Link href={`/search?property-type=apartment`}>
+            <Button size="lg" className="cursor-pointer">
               <FaBuilding />
-              {t.buttons.apartments}
+              Apartments
             </Button>
           </Link>
-          <Link href={`/${lang}/search?property-type=house`}>
-            <Button size="lg">
+          <Link href={`/search?property-type=house`}>
+            <Button size="lg" className="cursor-pointer">
               <FaHouseChimney />
-              {t.buttons.houses}
+              Houses
             </Button>
           </Link>
         </div>
