@@ -29,8 +29,8 @@ import {
 } from "@/db/schema";
 
 export const estateSchema = z.object({
-  sellerId: z.coerce.number().optional(),
-  brokerId: z.coerce.number().optional(),
+  // sellerId: z.string().optional(),
+  brokerId: z.string(),
 
   category: z.enum(estateCategoryEnum.enumValues, { error: "Required" }),
   operationType: z.enum(operationTypeEnum.enumValues, { error: "Required" }),
@@ -204,7 +204,7 @@ export type InsertFormSchema = z.infer<typeof InsertFormSchema>;
 export const defaultInsertFormValues: InsertFormSchema = {
   estate: {
     // sellerId: 0,
-    // brokerId: 0,
+    brokerId: "",
 
     category: estateCategoryEnum.enumValues[0],
     operationType: operationTypeEnum.enumValues[0],
@@ -313,3 +313,41 @@ export const authSchemaDefault = {
 };
 
 export type AuthFormValues = z.infer<typeof authSchema>;
+
+export const userProfileSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name is too long")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+
+  phoneNumber: z
+    .string()
+    .regex(/^\+[1-9]\d{1,14}$/, "Invalid phone number")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+
+  description: z
+    .string()
+    .max(1000, "Description is too long")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+
+  image: z
+    .url("Image must be a valid URL")
+    .optional()
+    .or(z.literal("").transform(() => undefined)),
+
+  file: z.file().optional(),
+});
+
+export const userProfileSchemaDefaultValues = {
+  name: "",
+  phoneNumber: "",
+  description: "",
+  image: "",
+  file: undefined,
+};
+
+export type UserProfileValues = z.infer<typeof userProfileSchema>;

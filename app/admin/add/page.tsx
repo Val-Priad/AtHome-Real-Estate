@@ -49,7 +49,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -61,6 +61,7 @@ import { Label } from "@/components/ui/label";
 import { formatErrors } from "./components/formatErrors";
 import { insertEstate } from "@/lib/actions/estate/addEstate";
 import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
+import { getAllBrokers } from "@/lib/actions/user/getAllBrokers";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
@@ -83,6 +84,17 @@ function Page() {
 
   const category = form.watch("estate.category");
   const vicinity = form.watch("vicinity");
+  const [brokers, setBrokers] = useState<{ id: string; name: string | null }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    async function load() {
+      const result = await getAllBrokers();
+      setBrokers(result);
+    }
+    load();
+  }, []);
 
   async function onSubmit(values: z.infer<typeof InsertFormSchema>) {
     await toast.promise(
@@ -258,6 +270,37 @@ function Page() {
       >
         <div className="space-y-3">
           <FieldGroup>
+            <Controller
+              name="estate.brokerId"
+              control={form.control}
+              render={({ field: { onChange, ...field }, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Broker</FieldLabel>
+
+                  <Select {...field} onValueChange={(value) => onChange(value)}>
+                    <SelectTrigger
+                      aria-invalid={fieldState.invalid}
+                      id={field.name}
+                      onBlur={field.onBlur}
+                    >
+                      <SelectValue placeholder="Select broker" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {brokers.map((broker) => (
+                        <SelectItem key={broker.id} value={broker.id}>
+                          {broker.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             <Controller
               name="estate.category"
               control={form.control}

@@ -299,15 +299,6 @@ export const accounts = pgTable(
   ],
 );
 
-// ---------- SESSIONS ----------
-export const sessions = pgTable("session", {
-  sessionToken: text("session_token").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-});
-
 // ---------- AUTHENTICATORS (для WebAuthn) ----------
 export const authenticators = pgTable(
   "authenticator",

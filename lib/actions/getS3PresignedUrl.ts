@@ -15,7 +15,7 @@ export async function getS3PresignedUrl(fileName: string, fileType: string) {
     ContentType: fileType,
   });
 
-  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 }); // 1 min
+  const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
 
   const publicUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
 
