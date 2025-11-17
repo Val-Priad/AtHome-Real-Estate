@@ -1,4 +1,4 @@
-import { verifyUser } from "@/lib/api/verify";
+import { verifyUser } from "@/lib/actions/user/verify";
 import { redirect } from "next/navigation";
 
 export default async function VerifyPage({

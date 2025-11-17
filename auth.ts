@@ -1,13 +1,83 @@
-import NextAuth from "next-auth";
+import { db } from "@/lib/db";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db } from "./lib/db";
-import { accounts, sessions, users } from "./db/schema";
+import Credentials from "next-auth/providers/credentials";
+import NextAuth from "next-auth";
+import { eq } from "drizzle-orm";
+import { users } from "@/db/schema";
+import bcrypt from "bcrypt";
 
-export const { handlers, auth } = NextAuth({
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-  }),
-  providers: [],
+import type { Adapter } from "next-auth/adapters";
+
+export const {
+  auth,
+  handlers: { GET, POST },
+  signIn,
+  signOut,
+} = NextAuth({
+  adapter: DrizzleAdapter(db) as Adapter,
+  session: { strategy: "jwt" },
+  providers: [
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (
+          !credentials ||
+          typeof credentials.email !== "string" ||
+          typeof credentials.password !== "string"
+        ) {
+          throw new Error("Invalid credentials");
+        }
+
+        const { email, password } = credentials;
+
+        const user = await db.query.users.findFirst({
+          where: eq(users.email, email),
+        });
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        const isValid = await bcrypt.compare(password, user.passwordHash);
+
+        if (!isValid) {
+          throw new Error("Invalid password");
+        }
+
+        return {
+          id: user.id,
+          role: user.role,
+          image: user.image,
+          name: user.name,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.image = user.image;
+        token.name = user.name;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.image = token.image as string;
+        session.user.name = token.name as string;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/login",
+  },
 });

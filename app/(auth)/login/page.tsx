@@ -7,42 +7,43 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { toast, Toaster } from "sonner";
 import { authSchema, authSchemaDefault } from "@/db/zodObjects";
-import { registerUser } from "@/lib/actions/user/register";
+import { useRouter } from "next/navigation";
+import { doCredentialLogIn } from "@/lib/actions/user/authActions";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const form = useForm<RegisterFormValues>({
+  type LoginFormValues = z.infer<typeof authSchema>;
+
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(authSchema),
     defaultValues: authSchemaDefault,
   });
 
-  type RegisterFormValues = z.infer<typeof authSchema>;
+  async function onSubmit(values: LoginFormValues) {
+    startTransition(async () => {
+      const result = await doCredentialLogIn(values.email, values.password);
 
-  async function onSubmit(values: RegisterFormValues) {
-    try {
-      await toast.promise(registerUser(values), {
-        loading: "Registering...",
-        success: "Check your email for confirmation link!",
-        error: (err) =>
-          err instanceof Error
-            ? err.message
-            : "Registration failed, try again later.",
-      });
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unexpected error occurred.";
-      toast.error(message);
-    }
+      if (result.success) {
+        toast.success("Logged in successfully!");
+        router.replace("/");
+        router.refresh();
+      } else {
+        toast.error(result.error);
+      }
+    });
   }
 
   return (
     <>
       <Toaster position="top-center" richColors />
-      <h1 className="mb-6 text-center text-2xl font-semibold">Register</h1>
+      <h1 className="mb-6 text-center text-2xl font-semibold">Login</h1>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <Controller
@@ -93,9 +94,15 @@ export default function LoginPage() {
             </Field>
           )}
         />
+        <Link
+          href={"/register"}
+          className="text-brand-6 -mt-2.5 flex items-center justify-center text-center text-sm tracking-wide italic underline"
+        >
+          register
+        </Link>
 
-        <Button type="submit" className="mt-4 w-full">
-          Continue
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? "Logging in..." : "Continue"}
         </Button>
       </form>
     </>
