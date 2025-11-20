@@ -1,5 +1,6 @@
 "use server";
-import { vicinityTypeEnum } from "@/db/schema";
+import { VicinityType, vicinityTypeEnum } from "@/db/schema";
+import { groupPlaces } from "@/utils/groupPlaces";
 import { haversineDistance } from "@/utils/haversineDistance";
 
 export type OSMElement = {
@@ -44,8 +45,6 @@ const VICINITY_TYPES = [
   { osmKey: "railway", osmValue: "station", type: "Train station" },
   { osmKey: "railway", osmValue: "subway_entrance", type: "Metro" },
 ];
-
-export type VicinityType = (typeof vicinityTypeEnum.enumValues)[number];
 
 export async function fetchVicinity(
   lat: number,
@@ -128,17 +127,6 @@ export async function fetchVicinity(
     }
     return { ok: false, message: "Unexpected Error" };
   }
-}
-
-function groupPlaces(places: Place[]) {
-  const groups: Record<string, Place[]> = {};
-  for (const place of places) {
-    if (!groups[place.type]) {
-      groups[place.type] = [];
-    }
-    groups[place.type].push(place);
-  }
-  return groups;
 }
 
 function getSortedPlacesInGroups(groups: Record<string, Place[]>) {

@@ -62,6 +62,7 @@ import { formatErrors } from "./components/formatErrors";
 import { insertEstate } from "@/lib/actions/estate/addEstate";
 import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
 import { getAllBrokers } from "@/lib/actions/user/getAllBrokers";
+import VicinityTabs from "@/components/Elements/VicinityTabs";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
@@ -865,54 +866,11 @@ function Page() {
               )}
             </Button>
 
-            {vicinity &&
-              Object.values(vicinity).some(
-                (places) => Array.isArray(places) && places.length > 0,
-              ) && (
-                <Tabs
-                  value={tabVicinityValue}
-                  onValueChange={setTabVicinityValue}
-                  className=""
-                >
-                  <div className="overflow-x-scroll">
-                    <TabsList className="">
-                      {(Object.keys(vicinity) as (keyof typeof vicinity)[]).map(
-                        (type) => (
-                          <TabsTrigger key={type} value={type as string}>
-                            {type}
-                          </TabsTrigger>
-                        ),
-                      )}
-                    </TabsList>
-                  </div>
-                  {(Object.keys(vicinity) as (keyof typeof vicinity)[]).map(
-                    (type) => (
-                      <TabsContent key={type} value={type as string}>
-                        <div className="max-h-[200px] overflow-y-auto p-3">
-                          <div className="grid grid-cols-2 gap-3">
-                            {vicinity[type].map((place) => (
-                              <a
-                                key={place.id}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href={`https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}&zoom=19`}
-                                className="border-border bg-card hover:bg-accent hover:text-accent-foreground block rounded-lg border p-2 transition-colors"
-                              >
-                                <div className="flex justify-between text-sm">
-                                  <span className="truncate">{place.name}</span>
-                                  <span className="text-brand-6 whitespace-nowrap">
-                                    {place.distanceM} m
-                                  </span>
-                                </div>
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      </TabsContent>
-                    ),
-                  )}
-                </Tabs>
-              )}
+            <VicinityTabs
+              vicinity={vicinity}
+              tabValue={tabVicinityValue}
+              onTabChange={setTabVicinityValue}
+            />
           </FieldGroup>
 
           {category === "Apartment" && (

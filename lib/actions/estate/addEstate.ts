@@ -28,7 +28,7 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
       );
 
       const insertData = {
-        sellerId: values.estate.sellerId ?? null,
+        // sellerId: values.estate.sellerId ?? null,
         brokerId: values.estate.brokerId ?? null,
         category: values.estate.category,
         operationType: values.estate.operationType,

@@ -114,6 +114,8 @@ export const vicinityTypeEnum = pgEnum("VICINITY_TYPE_ENUM", [
   "Closest",
 ]);
 
+export type VicinityType = (typeof vicinityTypeEnum.enumValues)[number];
+
 export const userRoleEnum = pgEnum("USER_ROLE_ENUM", [
   "admin",
   "agent",

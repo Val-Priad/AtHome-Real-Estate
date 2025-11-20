@@ -1,0 +1,82 @@
+.energyLabel {
+  display: inline-block;
+}
+
+.qualityClass {
+  position: relative;
+  display: block;
+  height: 24px;
+  box-sizing: border-box;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding-left: 5px;
+  line-height: 24px;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.qualityClass::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  top: 0;
+  border: 12px solid transparent;
+}
+
+.classA {
+  width: 60px;
+  background-color: #bdd342;
+}
+.classA::after {
+  border-left: 12px solid #bdd342;
+}
+
+.classB {
+  width: 70px;
+  background-color: #ffe731;
+}
+.classB::after {
+  border-left: 12px solid #ffe731;
+}
+
+.classC {
+  width: 80px;
+  background-color: #fbb900;
+}
+.classC::after {
+  border-left: 12px solid #fbb900;
+}
+
+.classD {
+  width: 90px;
+  background-color: #fb8800;
+}
+.classD::after {
+  border-left: 12px solid #fb8800;
+}
+
+.classE {
+  width: 100px;
+  background-color: #e30613;
+}
+.classE::after {
+  border-left: 12px solid #e30613;
+}
+
+.classF {
+  width: 110px;
+  background-color: #d60714;
+}
+.classF::after {
+  border-left: 12px solid #d60714;
+}
+
+.classG {
+  width: 120px;
+  background-color: #c10613;
+}
+.classG::after {
+  border-left: 12px solid #c10613;
+}

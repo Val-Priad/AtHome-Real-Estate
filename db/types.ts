@@ -11,7 +11,10 @@ import {
   estateTranslation,
   estateWater,
   estateWaterHeating,
+  users,
 } from "./schema";
+
+export type User = typeof users.$inferSelect;
 
 export type EstateInsert = typeof estate.$inferInsert;
 export type EstateSelect = typeof estate.$inferSelect;

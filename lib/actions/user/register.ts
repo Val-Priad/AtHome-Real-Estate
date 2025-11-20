@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { emailVerifications, users } from "@/db/schema";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
-import { sendVerificationEmail } from "@/lib/actions/mail";
+import { sendVerificationEmail } from "@/lib/actions/sendVerificationEmail";
 import { eq } from "drizzle-orm";
 
 export async function registerUser(values: {

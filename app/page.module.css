@@ -1,0 +1,11 @@
+.bg-home {
+  background-image: url("/villa_20.webp");
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  z-index: -100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100dvh;
+}

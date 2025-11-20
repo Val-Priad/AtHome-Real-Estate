@@ -3,10 +3,11 @@ import Link from "next/link";
 import { FaBuilding } from "react-icons/fa";
 import { FaHouseChimney } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
+import styles from "./page.module.css";
 
 export default function Page() {
   return (
-    <main className="bg-home flex items-center justify-center">
+    <main className={`${styles["bg-home"]} flex items-center justify-center`}>
       <div className="flex w-50 flex-col sm:w-60 lg:w-66 xl:w-80 2xl:w-100">
         <div className="mb-5 flex flex-col items-center justify-center gap-1 2xl:mb-10">
           <Image
