@@ -10,7 +10,6 @@ import { Accordions } from "./components/Accordions";
 import ClientVicinity from "./components/ClientVicinity";
 import MapEmbed from "./components/IFrameMap";
 import AgentSection from "./components/AgentSection";
-import WriteToAgent from "./components/WriteToAgent";
 
 type PageProps = {
   params: {

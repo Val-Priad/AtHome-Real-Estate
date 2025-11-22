@@ -1,378 +1,503 @@
 "use client";
-
-import { HiMiniMagnifyingGlass } from "react-icons/hi2";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import CheckboxGroup, { CheckboxOption } from "./components/CheckboxGroup";
 import {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import {
-  VICINITY_FEATURE_OPTIONS,
-  FLOOR_PLAN_OPTIONS,
-  CONDITION_OPTIONS,
-  APARTMENT_ACCESSORY_OPTIONS,
-  ENERGY_CLASS_OPTIONS,
-  OFFER_TYPE_OPTIONS,
-  HOUSE_CATEGORY_OPTIONS,
-  HOUSE_SIZE_OPTIONS,
-  HOUSE_ACCESSORY_OPTIONS,
-  BUILDING_MATERIAL_OPTIONS,
-  VICINITY_OPTIONS,
-  REGION_OPTIONS,
-  REGION,
-} from "./components/options";
-import Section from "./components/Section";
-import SectionWithCheckboxes from "./components/SectionWithCheckboxes";
-import FromToSection from "./components/FromToSection";
-import Button from "@/components/ui/myButton";
-import SectionWithDropdown from "./components/SectionWithDropdown";
+  apartmentPlanEnum,
+  buildingConditionEnum,
+  buildingTypeEnum,
+  flatClassEnum,
+  houseCategoryEnum,
+  houseTypeEnum,
+  internetConnectionEnum,
+  operationTypeEnum,
+  regionEnum,
+  roomCountEnum,
+  vicinityTypeEnum,
+  waterHeatSourceEnum,
+} from "@/db/schema";
+import EstateTypeChoose from "./components/estateTypeChoose";
 import Map from "./components/Map";
-import SectionWithTextarea from "./components/SectionWithTextarea";
-import { useRouter } from "next/navigation";
 
-export interface SearchFormData {
-  location?: string;
-  area_min?: string;
-  area_max?: string;
-  price_min?: string;
-  price_max?: string;
-  smartSearch?: string;
-  [key: string]: string | string[] | undefined;
-}
+import { z } from "zod";
+import RangeGroup from "./components/RangeGroup";
+import { DistanceSelect } from "./components/DistanceToFacilities";
+import { AiSearchTextarea } from "./components/AiSearchTextArea";
+import { Button } from "@/components/ui/button";
+import { toast, Toaster } from "sonner";
+import { formatErrors } from "./components/formatErrors";
 
-export type TPropertyType = "apartment" | "house" | null;
+const optionalNumber = z
+  .string()
+  .trim()
+  .transform((v) => (v === "" ? undefined : v))
+  .refine(
+    (v) => v === undefined || /^-?\d+(\.\d+)?$/.test(v),
+    "Value must be a valid number",
+  )
+  .transform((v) => (v === undefined ? undefined : Number(v)));
+
+const searchSchema = z.object({
+  aiSearch: z
+    .string()
+    .max(1000, "Ai search query is too long")
+    .or(z.literal("").transform(() => undefined))
+    .optional(),
+
+  distanceToFacilities: z.enum(["0.5", "1", "1.5", "2", "5", "10"]).optional(),
+
+  floorFrom: optionalNumber,
+  floorTo: optionalNumber,
+
+  usableAreaFrom: optionalNumber,
+  usableAreaTo: optionalNumber,
+
+  landAreaFrom: optionalNumber,
+  landAreaTo: optionalNumber,
+
+  priceFrom: optionalNumber,
+  priceTo: optionalNumber,
+});
+
+type CheckboxStateType = {
+  estate: {
+    region: string[];
+    offerType: string[];
+    condition: string[];
+    energyClass: string[];
+    accessories: [];
+  };
+  estateApartment: {
+    flatClass: string[];
+    buildingMaterial: string[];
+    apartmentPlan: string[];
+    accessories: string[];
+  };
+  estateHouse: {
+    houseCategory: string[];
+    housePlan: string[];
+    houseType: string[];
+    accessories: string[];
+  };
+  multiselect: {
+    waterHeatSource: string[];
+    internetConnections: string[];
+  };
+  vicinity: {
+    facilitiesNearby: string[];
+  };
+};
+
+export type InputStateType = {
+  aiSearch: string;
+  distanceToFacilities: string;
+  floorFrom: string;
+  floorTo: string;
+  usableAreaFrom: string;
+  usableAreaTo: string;
+  landAreaFrom: string;
+  landAreaTo: string;
+  priceFrom: string;
+  priceTo: string;
+};
+
+type SettingsType = {
+  path: string;
+  label: string;
+  options: CheckboxOption[];
+  fieldValue: string[];
+};
+
+const INITIAL_CHECKBOX_STATE: CheckboxStateType = {
+  estate: {
+    region: [],
+    offerType: [],
+    condition: [],
+    energyClass: [],
+    accessories: [],
+  },
+  estateApartment: {
+    flatClass: [],
+    buildingMaterial: [],
+    apartmentPlan: [],
+    accessories: [],
+  },
+  estateHouse: {
+    houseCategory: [],
+    housePlan: [],
+    houseType: [],
+    accessories: [],
+  },
+  multiselect: {
+    waterHeatSource: [],
+    internetConnections: [],
+  },
+  vicinity: {
+    facilitiesNearby: [],
+  },
+};
+
+const INITIAL_INPUT_STATE = {
+  aiSearch: "",
+  distanceToFacilities: "0.5",
+  floorFrom: "",
+  floorTo: "",
+  usableAreaFrom: "",
+  usableAreaTo: "",
+  landAreaFrom: "",
+  landAreaTo: "",
+  priceFrom: "",
+  priceTo: "",
+};
 
 function Page() {
-  const params = useSearchParams();
-  const router = useRouter();
-  const [propertyType, setPropertyType] = useState<TPropertyType>(
-    params.get("property-type") as TPropertyType,
+  const [isLoading, setIsLoading] = useState(false);
+  const [estateType, setEstateType] = useState<"apartment" | "house" | null>(
+    "apartment",
   );
-  const [formData, setFormData] = useState<SearchFormData>({});
+  const [checkboxState, setCheckboxState] = useState<CheckboxStateType>(
+    INITIAL_CHECKBOX_STATE,
+  );
+  const [inputState, setInputState] = useState(INITIAL_INPUT_STATE);
 
-  const selectedRegions = formData[toSnakeCase(REGION)] as string[] | undefined;
-
-  useEffect(() => {
-    const newFormData: SearchFormData = {};
-    params.forEach((value, key) => {
-      if (newFormData[key]) {
-        if (Array.isArray(newFormData[key])) {
-          newFormData[key].push(value);
-        } else {
-          newFormData[key] = [newFormData[key], value];
-        }
-      } else {
-        newFormData[key] = value;
-      }
-    });
-    setFormData(newFormData);
-
-    const propertyTypeParam = params.get("property_type") as TPropertyType;
-    if (propertyTypeParam) setPropertyType(propertyTypeParam);
-  }, [params]);
-
-  function handleTypeChange(newType: TPropertyType) {
-    setPropertyType((prev) => (newType === prev ? null : newType));
-    setFormData({});
-  }
-
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-  }
-
-  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prev) => {
-      const isArrayField = CAMEL_ARRAY_FIELDS.includes(name);
-
-      if (type === "checkbox" && isArrayField) {
-        const currentValue = (prev[name] as string[]) || [];
-
-        if (checked) {
-          return {
-            ...prev,
-            [name]: [...currentValue, value],
-          };
-        } else {
-          const newValues = currentValue.filter((v) => v !== value);
-          return {
-            ...prev,
-            [name]: newValues.length > 0 ? newValues : undefined,
-          };
-        }
-      }
+  function updateCheckbox(path: string, updated: string[]) {
+    setCheckboxState((prev) => {
+      const [section, key] = path.split(".");
 
       return {
         ...prev,
-        [name]: value,
+        [section]: {
+          ...prev[section as keyof CheckboxStateType],
+          [key]: updated,
+        },
       };
     });
-  }, []);
-
-  const handleSelectChange = useCallback(
-    (e: ChangeEvent<HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    },
-    [],
-  );
-
-  const handleMapChange = useCallback((regionTitle: string) => {
-    const name = toSnakeCase(REGION);
-    setFormData((prev) => {
-      const currentValue = (prev[name] as string[]) || [];
-      if (currentValue.length === 0) {
-        return { ...prev, [name]: [regionTitle] };
-      }
-
-      if (currentValue.includes(regionTitle)) {
-        const newValues = currentValue.filter((value) => value !== regionTitle);
-        return {
-          ...prev,
-          [name]: newValues.length > 0 ? newValues : undefined,
-        };
-      }
-
-      return { ...prev, [name]: [...currentValue, regionTitle] };
-    });
-  }, []);
-
-  const handleTextareaChange = useCallback(
-    (e: ChangeEvent<HTMLTextAreaElement>) => {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    },
-    [],
-  );
-
-  function isChecked(name: keyof SearchFormData, value: string) {
-    const field = formData[name];
-    return Array.isArray(field) && field.includes(value);
   }
 
-  function buildQueryString(
-    formData: SearchFormData,
-    propertyType: TPropertyType,
+  function updateInput(
+    key: keyof typeof inputState,
+    value: string | undefined,
   ) {
-    const params = new URLSearchParams();
+    setInputState((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  }
 
-    if (propertyType) {
-      params.set("property_type", propertyType);
-    }
+  async function handleSubmit() {
+    setIsLoading(true);
+    const dismiss = toast.loading("Searching...");
 
-    Object.entries(formData).forEach(([key, value]) => {
-      if (!value) return;
+    try {
+      const result = searchSchema.safeParse(inputState);
 
-      if (Array.isArray(value)) {
-        value.forEach((v) => params.append(key, v));
-      } else {
-        params.set(key, value);
+      if (!result.success) {
+        toast.dismiss(dismiss);
+
+        const flattened = result.error.flatten();
+        const fieldErrors = flattened.fieldErrors;
+        const formErrors = flattened.formErrors;
+
+        const message = [
+          ...formErrors,
+          ...Object.entries(fieldErrors).flatMap(([field, msgs]) =>
+            msgs.map((msg) => `${field}: ${msg}`),
+          ),
+        ].join("\n");
+
+        toast.error("Validation error", {
+          description: message || "Invalid form input",
+        });
+
+        return;
       }
-    });
 
-    return params.toString();
+      const validatedInputs = result.data;
+
+      const payload = {
+        ...validatedInputs,
+        ...checkboxState,
+        estateType,
+      };
+
+      console.log("FINAL PAYLOAD:", payload);
+
+      await new Promise((r) => setTimeout(r, 1200));
+
+      toast.dismiss(dismiss);
+
+      toast.success("Filters applied!", {
+        description: "Search results have been updated.",
+      });
+    } catch (error) {
+      toast.dismiss(dismiss);
+
+      if (error instanceof Error) {
+        toast.error("Unexpected error", {
+          description: error.message,
+        });
+      } else {
+        toast.error("Unexpected error", {
+          description: "Something went wrong.",
+        });
+      }
+    }
+    setIsLoading(false);
   }
 
-  function handleSearchClick() {
-    const queryString = buildQueryString(formData, propertyType);
-    router.push(`/search/results?${queryString}`);
-  }
+  const generalAccessories = ["Furnished", "Easy Access"];
+  const apartmentAccessories = [
+    "Balcony",
+    "Loggia",
+    "Terrace",
+    "Garden",
+    "Parking",
+    "Elevator",
+  ];
+  const houseAccessories = [
+    "Parking",
+    "Garden",
+    "Multi",
+    "Pool",
+    "Cellar",
+    "Garage",
+  ];
+
+  const generalCheckboxSettings: SettingsType[] = [
+    {
+      path: "estate.region",
+      label: "Region",
+      options: regionEnum.enumValues,
+      fieldValue: checkboxState.estate.region,
+    },
+    {
+      path: "estate.offerType",
+      label: "Offer Type",
+      options: operationTypeEnum.enumValues,
+      fieldValue: checkboxState.estate.offerType,
+    },
+    {
+      path: "estate.condition",
+      label: "Condition",
+      options: buildingConditionEnum.enumValues,
+      fieldValue: checkboxState.estate.condition,
+    },
+    {
+      path: "estate.energyClass",
+      label: "Energy Consumption Classes",
+      options: [
+        { value: "A", label: "A - Most energy efficient" },
+        { value: "B", label: "B - Very energy efficient" },
+        { value: "C", label: "C - Energy efficient" },
+        { value: "D", label: "D - Average energy efficiency" },
+        { value: "E", label: "E - Low energy efficiency" },
+        { value: "F", label: "F - Very low energy efficiency" },
+        { value: "G", label: "G - Least energy efficient" },
+      ],
+      fieldValue: checkboxState.estate.energyClass,
+    },
+    {
+      path: "estate.accessories",
+      label: "Estate accessories",
+      options: generalAccessories,
+      fieldValue: checkboxState.estate.accessories,
+    },
+  ];
+  const apartmentCheckboxSettings: SettingsType[] = [
+    {
+      path: "estateApartment.flatClass",
+      label: "Flat Class",
+      options: flatClassEnum.enumValues,
+      fieldValue: checkboxState.estateApartment.flatClass,
+    },
+    {
+      path: "estateApartment.buildingMaterial",
+      label: "Building Material",
+      options: buildingTypeEnum.enumValues,
+      fieldValue: checkboxState.estateApartment.buildingMaterial,
+    },
+    {
+      path: "estateApartment.apartmentPlan",
+      label: "Apartment Plan",
+      options: apartmentPlanEnum.enumValues,
+      fieldValue: checkboxState.estateApartment.apartmentPlan,
+    },
+    {
+      path: "estateApartment.accessories",
+      label: "Apartment Accessories",
+      options: apartmentAccessories,
+      fieldValue: checkboxState.estateApartment.accessories,
+    },
+  ];
+  const houseCheckboxSettings: SettingsType[] = [
+    {
+      path: "estateHouse.houseCategory",
+      label: "House Category",
+      options: houseCategoryEnum.enumValues,
+      fieldValue: checkboxState.estateHouse.houseCategory,
+    },
+    {
+      path: "estateHouse.housePlan",
+      label: "House Plan",
+      options: roomCountEnum.enumValues,
+      fieldValue: checkboxState.estateHouse.housePlan,
+    },
+    {
+      path: "estateHouse.houseType",
+      label: "House Type",
+      options: houseTypeEnum.enumValues,
+      fieldValue: checkboxState.estateHouse.houseType,
+    },
+    {
+      path: "estateHouse.accessories",
+      label: "House Accessories",
+      options: houseAccessories,
+      fieldValue: checkboxState.estateHouse.accessories,
+    },
+  ];
+  const multiselectCheckboxSettings: SettingsType[] = [
+    {
+      path: "multiselect.waterHeatSource",
+      label: "Water Heating Source",
+      options: waterHeatSourceEnum.enumValues,
+      fieldValue: checkboxState.multiselect.waterHeatSource,
+    },
+    {
+      path: "multiselect.waterHeatSource",
+      label: "Internet Connection",
+      options: internetConnectionEnum.enumValues,
+      fieldValue: checkboxState.multiselect.waterHeatSource,
+    },
+  ];
 
   return (
-    <main className="flex justify-center px-2">
-      <form
-        className="border-brand-6 max-w-228 rounded-t-2xl border border-b-0 bg-stone-100 px-4 py-4"
-        onSubmit={handleSubmit}
-      >
-        <h1 className="text-brand-10 text-h5 mb-7.5 text-center">
-          Property Search Filters
-        </h1>
-
+    <main className="flex items-center justify-center">
+      <div className="border-brand-6/50 m-3 flex max-w-228 flex-col gap-6 rounded-xl border-2 p-5">
+        <Toaster richColors position="top-center" />
         <Map
-          handleMapChange={handleMapChange}
-          selectedRegions={selectedRegions}
+          fieldValue={checkboxState.estate.region}
+          onChange={(updated) => updateCheckbox("estate.region", updated)}
         />
 
-        <Section sectionName="Property Type">
-          <div className="space-y-2">
-            <div className="mt-2 flex rounded-md bg-red-100">
-              <Button
-                type="search-checkbox-btn"
-                onClick={() => handleTypeChange("apartment")}
-                forPropertyType={"apartment"}
-                curPropertyType={propertyType}
-              >
-                Apartment
-              </Button>
-              <Button
-                type="search-checkbox-btn"
-                forPropertyType={"house"}
-                curPropertyType={propertyType}
-                onClick={() => handleTypeChange("house")}
-              >
-                House
-              </Button>
-            </div>
-
-            {!propertyType && (
-              <p className="text-small text-center text-stone-500">
-                * Property type not specified: searching for all property types.
-              </p>
-            )}
-          </div>
-        </Section>
-
-        <SectionWithCheckboxes
-          sectionName="Region"
-          handleInputChange={handleInputChange}
-          isChecked={isChecked}
-          options={REGION_OPTIONS}
-        />
-
-        <SectionWithCheckboxes
-          sectionName="Offer Type"
-          handleInputChange={handleInputChange}
-          isChecked={isChecked}
-          options={OFFER_TYPE_OPTIONS}
-        />
-
-        {propertyType === "apartment" && (
-          <SectionWithCheckboxes
-            sectionName="Floor Plan"
-            handleInputChange={handleInputChange}
-            isChecked={isChecked}
-            options={FLOOR_PLAN_OPTIONS}
+        <EstateTypeChoose handleClick={setEstateType} estateType={estateType} />
+        {generalCheckboxSettings.map((settings) => (
+          <CheckboxGroup
+            key={settings.label}
+            label={settings.label}
+            options={settings.options}
+            fieldValue={settings.fieldValue}
+            onChange={(updated) => updateCheckbox(settings.path, updated)}
           />
-        )}
+        ))}
 
-        {propertyType === "house" && (
-          <>
-            <SectionWithCheckboxes
-              sectionName="House Category"
-              handleInputChange={handleInputChange}
-              isChecked={isChecked}
-              options={HOUSE_CATEGORY_OPTIONS}
+        {estateType === "apartment" &&
+          apartmentCheckboxSettings.map((settings) => (
+            <CheckboxGroup
+              key={settings.label}
+              label={settings.label}
+              options={settings.options}
+              fieldValue={settings.fieldValue}
+              onChange={(updated) => updateCheckbox(settings.path, updated)}
             />
-            <SectionWithCheckboxes
-              sectionName="House Size"
-              handleInputChange={handleInputChange}
-              isChecked={isChecked}
-              options={HOUSE_SIZE_OPTIONS}
-            />{" "}
-          </>
-        )}
+          ))}
 
-        {propertyType === "apartment" && (
-          <FromToSection
-            handleInputChange={handleInputChange}
-            sectionName="Floor"
-            formData={formData}
+        {estateType === "house" &&
+          houseCheckboxSettings.map((settings) => (
+            <CheckboxGroup
+              key={settings.label}
+              label={settings.label}
+              options={settings.options}
+              fieldValue={settings.fieldValue}
+              onChange={(updated) => updateCheckbox(settings.path, updated)}
+            />
+          ))}
+
+        {multiselectCheckboxSettings.map((settings) => (
+          <CheckboxGroup
+            key={settings.label}
+            label={settings.label}
+            options={settings.options}
+            fieldValue={settings.fieldValue}
+            onChange={(updated) => updateCheckbox(settings.path, updated)}
+          />
+        ))}
+
+        <DistanceSelect
+          value={inputState.distanceToFacilities}
+          onChange={(val) => updateInput("distanceToFacilities", val)}
+        />
+
+        <CheckboxGroup
+          key="Facilities Nearby"
+          label="Facilities Nearby"
+          options={vicinityTypeEnum.enumValues.filter(
+            (type) => type !== "Closest",
+          )}
+          fieldValue={checkboxState.vicinity.facilitiesNearby}
+          onChange={(updated) =>
+            updateCheckbox("vicinity.facilitiesNearby", updated)
+          }
+        />
+
+        {estateType === "apartment" && (
+          <RangeGroup
+            label="Floor"
+            fromKey="floorFrom"
+            toKey="floorTo"
+            state={inputState}
+            onChange={updateInput}
           />
         )}
 
-        {propertyType === "house" && (
-          <FromToSection
-            handleInputChange={handleInputChange}
-            sectionName="Land Area"
-            isArea={true}
-            formData={formData}
+        {estateType === "house" && (
+          <RangeGroup
+            label="Land Area"
+            fromKey="landAreaFrom"
+            toKey="landAreaTo"
+            state={inputState}
+            onChange={updateInput}
           />
         )}
 
-        <FromToSection
-          handleInputChange={handleInputChange}
-          sectionName="Usable Area"
-          isArea={true}
-          formData={formData}
+        <RangeGroup
+          label="Usable Area"
+          fromKey="usableAreaFrom"
+          toKey="usableAreaTo"
+          state={inputState}
+          onChange={updateInput}
         />
 
-        <FromToSection
-          handleInputChange={handleInputChange}
-          sectionName="Price"
-          currency="$"
-          formData={formData}
+        <RangeGroup
+          label="Price"
+          fromKey="priceFrom"
+          toKey="priceTo"
+          state={inputState}
+          onChange={updateInput}
         />
 
-        <SectionWithCheckboxes
-          sectionName="Condition"
-          handleInputChange={handleInputChange}
-          isChecked={isChecked}
-          options={CONDITION_OPTIONS}
+        <AiSearchTextarea
+          value={inputState.aiSearch}
+          onChange={(val) => updateInput("aiSearch", val)}
         />
-
-        {propertyType === "apartment" && (
-          <SectionWithCheckboxes
-            sectionName="Building Material"
-            handleInputChange={handleInputChange}
-            isChecked={isChecked}
-            options={BUILDING_MATERIAL_OPTIONS}
-          />
-        )}
-
-        {propertyType === "apartment" && (
-          <SectionWithCheckboxes
-            sectionName="Accessories"
-            options={APARTMENT_ACCESSORY_OPTIONS}
-            handleInputChange={handleInputChange}
-            isChecked={isChecked}
-          />
-        )}
-
-        {propertyType === "house" && (
-          <SectionWithCheckboxes
-            sectionName="Accessories"
-            options={HOUSE_ACCESSORY_OPTIONS}
-            handleInputChange={handleInputChange}
-            isChecked={isChecked}
-          />
-        )}
-
-        <SectionWithDropdown
-          sectionName="Distance to Facilities"
-          options={VICINITY_OPTIONS}
-          handleSelectChange={handleSelectChange}
-        />
-
-        <SectionWithCheckboxes
-          sectionName="Near the Apartments"
-          handleInputChange={handleInputChange}
-          isChecked={isChecked}
-          options={VICINITY_FEATURE_OPTIONS}
-        />
-
-        <SectionWithCheckboxes
-          sectionName={"Energy Class"}
-          handleInputChange={handleInputChange}
-          isChecked={isChecked}
-          options={ENERGY_CLASS_OPTIONS}
-        />
-
-        <SectionWithTextarea
-          sectionName={"Smart Search"}
-          handleTextareaChange={handleTextareaChange}
-        />
-
-        <div className="flex w-full justify-between gap-4">
-          <button
-            onClick={() => handleTypeChange(propertyType)}
-            className="border-brand-6 hover:border-brand-7 text-brand-10 my-8 w-full cursor-pointer rounded-lg border py-1 transition-colors"
+        <div>
+          <Button
+            className="w-1/2"
+            variant="secondary"
+            onClick={() => {
+              setInputState(INITIAL_INPUT_STATE);
+              setCheckboxState(INITIAL_CHECKBOX_STATE);
+            }}
           >
             Clear
-          </button>
-
-          <button
-            onClick={() => handleSearchClick()}
-            className="bg-brand-6 hover:bg-brand-7 my-8 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-1 text-stone-100 transition-colors"
+          </Button>
+          <Button
+            className="w-1/2"
+            onClick={async () => await handleSubmit()}
+            disabled={isLoading}
           >
-            <span>See N results</span>
-            <HiMiniMagnifyingGlass />
-          </button>
+            Search
+          </Button>
         </div>
-      </form>
+      </div>
     </main>
   );
 }

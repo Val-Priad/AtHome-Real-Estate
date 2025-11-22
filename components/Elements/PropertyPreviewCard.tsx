@@ -1,51 +1,53 @@
 import React from "react";
+import Image from "next/image";
+import { FilteredEstatePreview } from "@/lib/actions/estate/getEstateByFilters";
+import Link from "next/link";
 
-const PropertyPreviewCard: React.FC<{
-  property: {
-    id: number;
-    property_type: string;
-    floor_plan?: string;
-    house_size?: string;
-    usable_area: number;
-    offer_type: string;
-    price: number;
-    address: string;
-  };
-}> = ({ property }) => {
+interface Props {
+  property: FilteredEstatePreview;
+}
+
+const PropertyPreviewCard: React.FC<Props> = ({ property: estate }) => {
   const getPropertyTitle = () => {
-    const offerText = property.offer_type === "sale" ? "Sale" : "Lease";
-    const planText =
-      property.property_type === "apartment"
-        ? property.floor_plan
-        : property.house_size;
-
-    return `${offerText} of ${property.property_type} ${planText ?? ""} ${property.usable_area} m²`;
+    return `${estate.offer_type} ${estate.property_type} ${
+      estate.usable_area ? `${estate.usable_area} m²` : ""
+    }`;
   };
 
   return (
-    // TODO better hover effect
-    <div className="min-w-67.5 overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md">
-      {/* Image Container */}
-      <div className="relative aspect-[4/3] bg-gray-200">
-        {/* <img
-          src="https://d18-a.sdn.cz/d_18/c_img_oe_A/kBlLbSfl8C2TnDZFEjXlR6/ac1f.jpeg?fl=res,800,600,3%7Cshr,,20%7Cwebp,60"
-          alt={property.address}
-          className="h-full w-full object-cover"
-        /> */}
-        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-400 to-stone-50"></div>
-      </div>
+    <div className="group min-w-67.5 overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <Link href={`${process.env.NEXT_PUBLIC_APP_URL}/estate/${estate.id}`}>
+        <div className="relative aspect-4/3 overflow-hidden">
+          {estate.image ? (
+            <Image
+              src={estate.image}
+              alt={estate.address}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-gray-300 to-stone-50 text-gray-600">
+              No photo
+            </div>
+          )}
 
-      <div className="p-4">
-        <h3 className="mb-1.5 text-base font-normal text-gray-700">
-          {getPropertyTitle()}
-        </h3>
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/10" />
+        </div>
 
-        <p className="mb-3 text-base text-gray-600">{property.address}</p>
+        <div className="p-4">
+          <h3 className="mb-1.5 text-base font-normal text-gray-700 transition-colors duration-300 group-hover:text-gray-900">
+            {getPropertyTitle()}
+          </h3>
 
-        <p className="text-2xl font-semibold text-gray-900">
-          {property.price} $
-        </p>
-      </div>
+          <p className="mb-3 text-base text-gray-600 transition-colors duration-300 group-hover:text-gray-800">
+            {estate.address}
+          </p>
+
+          <p className="text-2xl font-semibold text-gray-900 transition-transform duration-300 group-hover:scale-[1.03]">
+            {estate.price.toLocaleString("en-US")} Kč
+          </p>
+        </div>
+      </Link>
     </div>
   );
 };

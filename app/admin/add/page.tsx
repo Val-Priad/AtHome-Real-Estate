@@ -1886,7 +1886,7 @@ function Page() {
                 fieldState,
               }) => (
                 <Field>
-                  <FieldLabel>Internet</FieldLabel>
+                  <FieldLabel>Telecommunication</FieldLabel>
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}

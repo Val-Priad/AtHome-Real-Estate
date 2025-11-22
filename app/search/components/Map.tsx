@@ -2,15 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { REGIONS } from "./regions";
 
 export default function Map({
-  handleMapChange,
-  selectedRegions,
+  fieldValue,
+  onChange,
 }: Readonly<{
-  handleMapChange: (regionTitle: string) => void;
-  selectedRegions: string[] | undefined;
+  fieldValue: string[];
+  onChange: (updated: string[]) => void;
 }>) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
-  const selected = selectedRegions;
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -29,6 +28,14 @@ export default function Map({
     );
   }, []);
 
+  function toggleRegion(title: string) {
+    const updated = fieldValue.includes(title)
+      ? fieldValue.filter((v) => v !== title)
+      : [...fieldValue, title];
+
+    onChange(updated);
+  }
+
   return (
     <div className="flex items-center justify-center">
       <svg
@@ -38,7 +45,7 @@ export default function Map({
         className="h-auto w-3/4"
       >
         {REGIONS.map((region) => {
-          const isActive = selected?.includes(region.title);
+          const isActive = fieldValue.includes(region.title);
           const isHovered = hovered === region.title;
 
           return (
@@ -57,7 +64,7 @@ export default function Map({
               stroke="#333"
               strokeWidth={0.8}
               className="cursor-pointer transition-colors duration-150"
-              onClick={() => handleMapChange(region.title)}
+              onClick={() => toggleRegion(region.title)}
               onMouseEnter={() => setHovered(region.title)}
               onMouseLeave={() => setHovered(null)}
             />

@@ -21,6 +21,7 @@ import {
 export const regionEnum = pgEnum("REGION_CODE_ENUM", [
   "Vinnytsia Region", // UA-05
   "Volyn Region", // UA-07
+  "Luhansk Region", // UA-09
   "Dnipropetrovsk Region", // UA-12
   "Donetsk Region", // UA-14
   "Zhytomyr Region", // UA-18
@@ -178,6 +179,7 @@ export const waterHeatSourceEnum = pgEnum("WATER_HEAT_SOURCE_ENUM", [
   "Gas boiler",
   "Flow heater",
   "Solar collector",
+  "Water central heating",
   "Other",
 ]);
 
@@ -194,7 +196,6 @@ export const heatingElementEnum = pgEnum("HEATING_ELEMENT_ENUM", [
   "Radiator",
   "Underfloor heating",
   "Stove with water circuit",
-  "Heat pump",
   "Other",
 ]);
 
@@ -340,10 +341,10 @@ export const estate = pgTable("estate", {
   id: serial("id").primaryKey(),
   sellerId: text("seller_id").references(() => users.id, {
     onDelete: "set null",
-  }), // TODO search field for owner, could be null if owner is not registered
+  }),
   brokerId: text("broker_id").references(() => users.id, {
     onDelete: "set null",
-  }), // TODO dropdown list of brokers is generated from profile with role 'agent'
+  }),
 
   category: estateCategoryEnum("category").notNull(), // dropdown
   operationType: operationTypeEnum("operation_type").notNull(), // dropdown
