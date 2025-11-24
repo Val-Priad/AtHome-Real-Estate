@@ -54,7 +54,6 @@ function WriteToAgent({
           name: u.name ?? "",
           email: u.email ?? "",
           phone: u.phoneNumber ?? "",
-          description: "",
         });
       }
     };
@@ -67,6 +66,7 @@ function WriteToAgent({
     toast.promise(
       sendEmailToAgent(agentEmail, {
         ...values,
+        userDescription: user?.description,
         estateTitle: estateTitle,
         estateUrl: `${process.env.NEXT_PUBLIC_APP_URL}/estate/${estateId}`,
       }),
@@ -130,8 +130,12 @@ function WriteToAgent({
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Bio</FieldLabel>
-              <Textarea id={field.name} placeholder="About you..." {...field} />
+              <FieldLabel htmlFor={field.name}>Message content</FieldLabel>
+              <Textarea
+                id={field.name}
+                placeholder="Write your message"
+                {...field}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}

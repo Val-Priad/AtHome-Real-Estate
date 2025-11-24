@@ -22,13 +22,13 @@ export default function Page() {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-6 md:gap-8 2xl:gap-10">
-          <Link href={`/search?property-type=apartment`}>
+          <Link href={`/search?estateType=apartment`}>
             <Button size="lg" className="cursor-pointer">
               <FaBuilding />
               Apartments
             </Button>
           </Link>
-          <Link href={`/search?property-type=house`}>
+          <Link href={`/search?estateType=house`}>
             <Button size="lg" className="cursor-pointer">
               <FaHouseChimney />
               Houses

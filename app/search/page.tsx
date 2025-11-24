@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CheckboxGroup, { CheckboxOption } from "./components/CheckboxGroup";
 import {
   apartmentPlanEnum,
@@ -24,7 +24,22 @@ import { DistanceSelect } from "./components/DistanceToFacilities";
 import { AiSearchTextarea } from "./components/AiSearchTextArea";
 import { Button } from "@/components/ui/button";
 import { toast, Toaster } from "sonner";
-import { formatErrors } from "./components/formatErrors";
+import {
+  ApartmentPlanEnum,
+  BuildingMaterialEnum,
+  ConditionEnum,
+  EnergyClassEnum,
+  FacilityEnum,
+  FlatClassEnum,
+  HouseCategoryEnum,
+  HousePlanEnum,
+  HouseTypeEnum,
+  InternetConnectionEnum,
+  OfferTypeEnum,
+  RegionEnum,
+  WaterHeatEnum,
+} from "@/db/types";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const optionalNumber = z
   .string()
@@ -45,57 +60,60 @@ const searchSchema = z.object({
 
   distanceToFacilities: z.enum(["0.5", "1", "1.5", "2", "5", "10"]).optional(),
 
-  floorFrom: optionalNumber,
-  floorTo: optionalNumber,
-
   usableAreaFrom: optionalNumber,
   usableAreaTo: optionalNumber,
-
-  landAreaFrom: optionalNumber,
-  landAreaTo: optionalNumber,
 
   priceFrom: optionalNumber,
   priceTo: optionalNumber,
 });
 
-type CheckboxStateType = {
+export type CheckboxStateType = {
   estate: {
-    region: string[];
-    offerType: string[];
-    condition: string[];
-    energyClass: string[];
-    accessories: [];
+    region: RegionEnum[];
+    offerType: OfferTypeEnum[];
+    condition: ConditionEnum[];
+    energyClass: EnergyClassEnum[];
+    accessories: string[];
   };
   estateApartment: {
-    flatClass: string[];
-    buildingMaterial: string[];
-    apartmentPlan: string[];
+    flatClass: FlatClassEnum[];
+    buildingType: BuildingMaterialEnum[];
+    apartmentPlan: ApartmentPlanEnum[];
     accessories: string[];
   };
   estateHouse: {
-    houseCategory: string[];
-    housePlan: string[];
-    houseType: string[];
+    houseCategory: HouseCategoryEnum[];
+    housePlan: HousePlanEnum[];
+    houseType: HouseTypeEnum[];
     accessories: string[];
   };
   multiselect: {
-    waterHeatSource: string[];
-    internetConnections: string[];
+    waterHeatSource: WaterHeatEnum[];
+    internetConnections: InternetConnectionEnum[];
   };
   vicinity: {
-    facilitiesNearby: string[];
+    facilitiesNearby: FacilityEnum[];
   };
 };
 
 export type InputStateType = {
+  aiSearch?: string;
+  distanceToFacilities?: string;
+
+  usableAreaFrom?: number;
+  usableAreaTo?: number;
+
+  priceFrom?: number;
+  priceTo?: number;
+};
+
+export type InputUIStateType = {
   aiSearch: string;
   distanceToFacilities: string;
-  floorFrom: string;
-  floorTo: string;
+
   usableAreaFrom: string;
   usableAreaTo: string;
-  landAreaFrom: string;
-  landAreaTo: string;
+
   priceFrom: string;
   priceTo: string;
 };
@@ -117,7 +135,7 @@ const INITIAL_CHECKBOX_STATE: CheckboxStateType = {
   },
   estateApartment: {
     flatClass: [],
-    buildingMaterial: [],
+    buildingType: [],
     apartmentPlan: [],
     accessories: [],
   },
@@ -150,14 +168,66 @@ const INITIAL_INPUT_STATE = {
 };
 
 function Page() {
+  const router = useRouter();
+  const params = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [estateType, setEstateType] = useState<"apartment" | "house" | null>(
-    "apartment",
+    null,
   );
   const [checkboxState, setCheckboxState] = useState<CheckboxStateType>(
     INITIAL_CHECKBOX_STATE,
   );
   const [inputState, setInputState] = useState(INITIAL_INPUT_STATE);
+
+  useEffect(() => {
+    restoreStateFromParams(params);
+  }, [params]);
+
+  function restoreStateFromParams(params: URLSearchParams) {
+    const restoredCheckbox: CheckboxStateType = JSON.parse(
+      JSON.stringify(INITIAL_CHECKBOX_STATE),
+    );
+    const restoredInput: typeof INITIAL_INPUT_STATE = JSON.parse(
+      JSON.stringify(INITIAL_INPUT_STATE),
+    );
+
+    for (const [key, value] of params.entries()) {
+      if (key.includes(".")) {
+        const [section, inner] = key.split(".");
+
+        const sec = section as keyof CheckboxStateType;
+        const innerKey = inner as keyof CheckboxStateType[typeof sec];
+
+        // Теперь TS знает тип!
+        const targetArray = restoredCheckbox[sec][innerKey] as
+          | string[]
+          | undefined;
+
+        if (!targetArray) {
+          // Создаём новый массив правильно
+          (restoredCheckbox[sec][innerKey] as string[]) = [value];
+        } else {
+          targetArray.push(value);
+        }
+
+        continue;
+      }
+
+      // Примитивные поля inputState
+      if (key in restoredInput) {
+        restoredInput[key as keyof typeof restoredInput] = value;
+        continue;
+      }
+
+      if (key === "estateType") {
+        setEstateType(value as "apartment" | "house" | null);
+        continue;
+      }
+    }
+
+    setCheckboxState(restoredCheckbox);
+    setInputState(restoredInput);
+  }
 
   function updateCheckbox(path: string, updated: string[]) {
     setCheckboxState((prev) => {
@@ -186,13 +256,11 @@ function Page() {
   async function handleSubmit() {
     setIsLoading(true);
     const dismiss = toast.loading("Searching...");
-
     try {
       const result = searchSchema.safeParse(inputState);
 
       if (!result.success) {
         toast.dismiss(dismiss);
-
         const flattened = result.error.flatten();
         const fieldErrors = flattened.fieldErrors;
         const formErrors = flattened.formErrors;
@@ -219,29 +287,51 @@ function Page() {
         estateType,
       };
 
-      console.log("FINAL PAYLOAD:", payload);
+      const queryString = buildQueryFromPayload(payload);
 
-      await new Promise((r) => setTimeout(r, 1200));
+      router.push(`/search/results?${queryString}`);
 
       toast.dismiss(dismiss);
-
-      toast.success("Filters applied!", {
-        description: "Search results have been updated.",
-      });
+      toast.success("Filters applied!");
     } catch (error) {
       toast.dismiss(dismiss);
+      toast.error("Unexpected error", {
+        description:
+          error instanceof Error ? error.message : "Something went wrong",
+      });
+    }
 
-      if (error instanceof Error) {
-        toast.error("Unexpected error", {
-          description: error.message,
-        });
-      } else {
-        toast.error("Unexpected error", {
-          description: "Something went wrong.",
-        });
+    setIsLoading(false);
+  }
+
+  function buildQueryFromPayload(
+    payload: InputStateType &
+      CheckboxStateType & {
+        estateType: "apartment" | "house" | null;
+      },
+  ) {
+    const params = new URLSearchParams();
+
+    // Примитивы
+    for (const [key, value] of Object.entries(payload)) {
+      if (value === undefined || value === null) continue;
+
+      if (typeof value === "string" || typeof value === "number") {
+        params.set(key, String(value));
+        continue;
+      }
+
+      // Вложенные объекты (группы чекбоксов)
+      if (typeof value === "object" && !Array.isArray(value)) {
+        for (const [innerKey, innerValue] of Object.entries(value)) {
+          if (Array.isArray(innerValue)) {
+            innerValue.forEach((v) => params.append(`${key}.${innerKey}`, v));
+          }
+        }
       }
     }
-    setIsLoading(false);
+
+    return params.toString();
   }
 
   const generalAccessories = ["Furnished", "Easy Access"];
@@ -256,7 +346,7 @@ function Page() {
   const houseAccessories = [
     "Parking",
     "Garden",
-    "Multi",
+    "Multi-story",
     "Pool",
     "Cellar",
     "Garage",
@@ -310,10 +400,10 @@ function Page() {
       fieldValue: checkboxState.estateApartment.flatClass,
     },
     {
-      path: "estateApartment.buildingMaterial",
+      path: "estateApartment.buildingType",
       label: "Building Material",
       options: buildingTypeEnum.enumValues,
-      fieldValue: checkboxState.estateApartment.buildingMaterial,
+      fieldValue: checkboxState.estateApartment.buildingType,
     },
     {
       path: "estateApartment.apartmentPlan",
@@ -362,10 +452,10 @@ function Page() {
       fieldValue: checkboxState.multiselect.waterHeatSource,
     },
     {
-      path: "multiselect.waterHeatSource",
+      path: "multiselect.internetConnections",
       label: "Internet Connection",
       options: internetConnectionEnum.enumValues,
-      fieldValue: checkboxState.multiselect.waterHeatSource,
+      fieldValue: checkboxState.multiselect.internetConnections,
     },
   ];
 
@@ -437,26 +527,6 @@ function Page() {
             updateCheckbox("vicinity.facilitiesNearby", updated)
           }
         />
-
-        {estateType === "apartment" && (
-          <RangeGroup
-            label="Floor"
-            fromKey="floorFrom"
-            toKey="floorTo"
-            state={inputState}
-            onChange={updateInput}
-          />
-        )}
-
-        {estateType === "house" && (
-          <RangeGroup
-            label="Land Area"
-            fromKey="landAreaFrom"
-            toKey="landAreaTo"
-            state={inputState}
-            onChange={updateInput}
-          />
-        )}
 
         <RangeGroup
           label="Usable Area"
