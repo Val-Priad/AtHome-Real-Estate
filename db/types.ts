@@ -1,4 +1,8 @@
 import {
+  apartmentPlanEnum,
+  buildingConditionEnum,
+  buildingTypeEnum,
+  energyClassEnum,
   estate,
   estateApartment,
   estateElectricity,
@@ -11,7 +15,16 @@ import {
   estateTranslation,
   estateWater,
   estateWaterHeating,
+  flatClassEnum,
+  houseCategoryEnum,
+  houseTypeEnum,
+  internetConnectionEnum,
+  operationTypeEnum,
+  regionEnum,
+  roomCountEnum,
   users,
+  vicinityTypeEnum,
+  waterHeatSourceEnum,
 } from "./schema";
 
 export type User = typeof users.$inferSelect;
@@ -68,3 +81,22 @@ export type EstateInput =
       estateTelecommunication?: EstateTelecommunicationInsert["telecommunication"][];
       estateInternet?: EstateInternetInsert["connectionType"][];
     };
+
+export type RegionEnum = (typeof regionEnum.enumValues)[number];
+export type OfferTypeEnum = (typeof operationTypeEnum.enumValues)[number];
+export type ConditionEnum = (typeof buildingConditionEnum.enumValues)[number];
+export type EnergyClassEnum = (typeof energyClassEnum.enumValues)[number];
+
+export type FlatClassEnum = (typeof flatClassEnum.enumValues)[number];
+export type BuildingMaterialEnum = (typeof buildingTypeEnum.enumValues)[number];
+export type ApartmentPlanEnum = (typeof apartmentPlanEnum.enumValues)[number];
+
+export type HouseCategoryEnum = (typeof houseCategoryEnum.enumValues)[number];
+export type HouseTypeEnum = (typeof houseTypeEnum.enumValues)[number];
+
+export type WaterHeatEnum = (typeof waterHeatSourceEnum.enumValues)[number];
+export type InternetConnectionEnum =
+  (typeof internetConnectionEnum.enumValues)[number];
+
+export type FacilityEnum = (typeof vicinityTypeEnum.enumValues)[number];
+export type HousePlanEnum = (typeof roomCountEnum.enumValues)[number];

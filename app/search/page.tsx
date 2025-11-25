@@ -21,7 +21,6 @@ import Map from "./components/Map";
 import { z } from "zod";
 import RangeGroup from "./components/RangeGroup";
 import { DistanceSelect } from "./components/DistanceToFacilities";
-import { AiSearchTextarea } from "./components/AiSearchTextArea";
 import { Button } from "@/components/ui/button";
 import { toast, Toaster } from "sonner";
 import {
@@ -52,12 +51,6 @@ const optionalNumber = z
   .transform((v) => (v === undefined ? undefined : Number(v)));
 
 const searchSchema = z.object({
-  aiSearch: z
-    .string()
-    .max(1000, "Ai search query is too long")
-    .or(z.literal("").transform(() => undefined))
-    .optional(),
-
   distanceToFacilities: z.enum(["0.5", "1", "1.5", "2", "5", "10"]).optional(),
 
   usableAreaFrom: optionalNumber,
@@ -198,13 +191,11 @@ function Page() {
         const sec = section as keyof CheckboxStateType;
         const innerKey = inner as keyof CheckboxStateType[typeof sec];
 
-        // Теперь TS знает тип!
         const targetArray = restoredCheckbox[sec][innerKey] as
           | string[]
           | undefined;
 
         if (!targetArray) {
-          // Создаём новый массив правильно
           (restoredCheckbox[sec][innerKey] as string[]) = [value];
         } else {
           targetArray.push(value);
@@ -213,7 +204,6 @@ function Page() {
         continue;
       }
 
-      // Примитивные поля inputState
       if (key in restoredInput) {
         restoredInput[key as keyof typeof restoredInput] = value;
         continue;
@@ -312,7 +302,6 @@ function Page() {
   ) {
     const params = new URLSearchParams();
 
-    // Примитивы
     for (const [key, value] of Object.entries(payload)) {
       if (value === undefined || value === null) continue;
 
@@ -321,7 +310,6 @@ function Page() {
         continue;
       }
 
-      // Вложенные объекты (группы чекбоксов)
       if (typeof value === "object" && !Array.isArray(value)) {
         for (const [innerKey, innerValue] of Object.entries(value)) {
           if (Array.isArray(innerValue)) {
@@ -544,10 +532,6 @@ function Page() {
           onChange={updateInput}
         />
 
-        <AiSearchTextarea
-          value={inputState.aiSearch}
-          onChange={(val) => updateInput("aiSearch", val)}
-        />
         <div>
           <Button
             className="w-1/2"

@@ -2,34 +2,52 @@ import Link from "next/link";
 import { GiSettingsKnobs } from "react-icons/gi";
 import { useSearchParams } from "next/navigation";
 
-function ConfigureFilters({ queryString }: Readonly<{ queryString: string }>) {
+export default function ConfigureFilters({
+  queryString,
+}: {
+  queryString: string;
+}) {
   const params = useSearchParams();
 
-  const regions = params.getAll("region");
+  // =============== LOCATION =================
+  const regions = params.getAll("estate.region");
   const location =
     regions.length === 0
-      ? "Any"
+      ? "Anywhere"
       : regions.length === 1
         ? regions[0]
         : `${regions.length} regions`;
 
-  const offerTypeParam = params.get("offer_type");
+  // =============== OFFER TYPE =================
+  const offerTypes = params.getAll("estate.offerType");
   const offerType =
-    offerTypeParam === "sale"
-      ? "Sale"
-      : offerTypeParam === "lease"
-        ? "Lease"
-        : "Any";
+    offerTypes.length === 0
+      ? "Any"
+      : offerTypes.length === 1
+        ? offerTypes[0]
+        : `${offerTypes.length} types`;
 
-  const propertyTypeParam = params.get("property_type");
+  // =============== PROPERTY TYPE =================
+  const estateType = params.get("estateType");
   const propertyType =
-    propertyTypeParam === "apartment"
+    estateType === "apartment"
       ? "Apartment"
-      : propertyTypeParam === "house"
+      : estateType === "house"
         ? "House"
         : "Any";
 
-  const price = "Unlimited";
+  // =============== PRICE RANGE =================
+  const priceFrom = params.get("priceFrom");
+  const priceTo = params.get("priceTo");
+
+  const price =
+    !priceFrom && !priceTo
+      ? "Any price"
+      : priceFrom && priceTo
+        ? `${priceFrom} – ${priceTo} €`
+        : priceFrom
+          ? `From ${priceFrom} €`
+          : `Up to ${priceTo} €`;
 
   return (
     <Link href={`/search?${queryString}`}>
@@ -66,5 +84,3 @@ function ConfigureFilters({ queryString }: Readonly<{ queryString: string }>) {
     </Link>
   );
 }
-
-export default ConfigureFilters;

@@ -1,10 +1,10 @@
 import React from "react";
 import Image from "next/image";
-import { FilteredEstatePreview } from "@/lib/actions/estate/getEstateByFilters";
+import { EstatePreview } from "@/lib/actions/estate/getEstateByFilters";
 import Link from "next/link";
 
 interface Props {
-  property: FilteredEstatePreview;
+  property: EstatePreview;
 }
 
 const PropertyPreviewCard: React.FC<Props> = ({ property: estate }) => {

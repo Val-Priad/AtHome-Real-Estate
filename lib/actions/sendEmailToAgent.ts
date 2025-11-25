@@ -12,10 +12,19 @@ export async function sendEmailToAgent(
     description: string;
     estateTitle?: string;
     estateUrl?: string;
+    userDescription?: string | null | undefined;
   },
 ) {
   try {
-    const { name, email, phone, description, estateTitle, estateUrl } = data;
+    const {
+      name,
+      email,
+      phone,
+      description,
+      estateTitle,
+      estateUrl,
+      userDescription,
+    } = data;
 
     const html = `
       <h2>New inquiry from ${name}</h2>
@@ -27,11 +36,19 @@ export async function sendEmailToAgent(
       ${estateTitle ? `<p><strong>Estate:</strong> ${estateTitle}</p>` : ""}
       ${estateUrl ? `<p><a href="${estateUrl}">Open Estate Listing</a></p>` : ""}
 
-      <h3>Message:</h3>
+      <h3>Message to agent:</h3>
       <p>${description}</p>
 
+      ${
+        userDescription
+          ? `
+        <h3>User profile bio:</h3>
+        <p>${userDescription}</p>
+      `
+          : ""
+      }
+
       <br/>
-      <p>This message was sent through your real estate platform.</p>
     `;
 
     const res = await resend.emails.send({

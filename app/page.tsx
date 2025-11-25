@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FaBuilding } from "react-icons/fa";
 import { FaHouseChimney } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
-import styles from "./page.module.css";
+import styles from "@/styles/page.module.css";
 
 export default function Page() {
   return (

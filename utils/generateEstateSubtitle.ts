@@ -5,16 +5,22 @@ export function generateEstateSubTitle(data: NonNullable<EstateData>) {
   const apartment = data.apartment;
   const house = data.house;
 
-  // OPERATION TYPE
-  const operation =
-    estate.operationType === "Sale"
-      ? "Apartment for sale"
-      : estate.operationType === "Lease"
-        ? "Apartment for rent"
+  const estateType =
+    estate.category === "Apartment"
+      ? "Apartment"
+      : estate.category === "House"
+        ? "House"
         : "Estate";
 
-  // CATEGORY PART
+  const operation =
+    estate.operationType === "Sale"
+      ? `${estateType} for sale`
+      : estate.operationType === "Lease"
+        ? `${estateType} for rent`
+        : estateType;
+
   let categoryPart = "";
+
   if (estate.category === "Apartment" && apartment) {
     categoryPart = apartment.apartmentPlan ?? "";
   }
@@ -23,10 +29,8 @@ export function generateEstateSubTitle(data: NonNullable<EstateData>) {
     categoryPart = house.roomCount ?? "";
   }
 
-  // AREA
   const areaPart = estate.usableArea ? `${estate.usableArea} m²` : "";
 
-  // LOCATION
   const street = estate.street;
   const city = estate.city;
   const region = estate.region ? `- ${estate.region}` : "";

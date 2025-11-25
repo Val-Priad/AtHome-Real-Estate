@@ -6,9 +6,11 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import WriteToAgent from "./WriteToAgent";
 import { EstateData } from "@/lib/actions/estate/getEstateById";
+import Link from "next/link";
 
 function AgentSection({ estateData }: { estateData: EstateData }) {
   const [agent, setAgent] = useState<User>();
+
   useEffect(() => {
     const getAgent = async () => {
       if (estateData?.estate.brokerId) {
@@ -19,16 +21,18 @@ function AgentSection({ estateData }: { estateData: EstateData }) {
   }, [estateData?.estate.brokerId]);
   return (
     <>
-      <div className="flex gap-6">
-        {agent?.image && (
-          <Image
-            src={agent?.image}
-            alt="Agent"
-            width={100}
-            height={100}
-            className="w-40"
-          />
-        )}
+      <div className="flex cursor-pointer gap-6">
+        <Link href={`/profile/${agent?.id}`}>
+          {agent?.image && (
+            <Image
+              src={agent?.image}
+              alt="Agent"
+              width={100}
+              height={100}
+              className="w-40"
+            />
+          )}
+        </Link>
         <div className="space-y-2">
           <div className="font-bold">{agent?.name}</div>
           <div className="space-y-1">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { InputStateType } from "../page";
+import { InputUIStateType } from "../page";
 
 export default function RangeGroup({
   label,
@@ -11,10 +11,10 @@ export default function RangeGroup({
   onChange,
 }: {
   label: string;
-  fromKey: keyof InputStateType;
-  toKey: keyof InputStateType;
-  state: InputStateType;
-  onChange: (key: keyof InputStateType, value: string) => void;
+  fromKey: keyof InputUIStateType;
+  toKey: keyof InputUIStateType;
+  state: InputUIStateType;
+  onChange: (key: keyof InputUIStateType, value: string) => void;
 }) {
   return (
     <div className="flex flex-col gap-3">

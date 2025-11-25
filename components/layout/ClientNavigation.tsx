@@ -32,7 +32,7 @@ export default async function ClientNavigation() {
         {user && (
           <>
             <li className="duration-300 hover:-translate-y-1">
-              <Link href="/profile/favorites">Saved</Link>
+              <Link href="/profile/saved">Saved</Link>
             </li>
             <li className="duration-300 hover:-translate-y-1">
               <Link href="/sell-with-us">Sell With Us</Link>

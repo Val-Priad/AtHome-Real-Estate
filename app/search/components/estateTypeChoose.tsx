@@ -20,7 +20,7 @@ function EstateTypeChoose({
         Apartment
       </Button>
       <Button
-        className={`${estateType !== "house" && "text-brand-9 bg-red-50"} w-1/2 hover:text-stone-50`}
+        className={`${estateType !== "house" && "text-brand-9 bg-red-100"} w-1/2 hover:text-stone-50`}
         onClick={() =>
           handleClick((prev) => (prev === "house" ? null : "house"))
         }

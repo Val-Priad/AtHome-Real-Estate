@@ -1,22 +1,19 @@
 "use server";
-import { estate, estateMedia } from "@/db/schema";
+
 import { db } from "@/lib/db";
+import { estate, estateMedia } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { EstatePreview } from "./searchEstate";
 
-export type FilteredEstatePreview = {
-  id: number;
-  property_type: "Apartment" | "House";
-  usable_area: number | null;
-  offer_type: "Sale" | "Lease";
-  price: number;
-  address: string;
-  image: string | null;
-};
+export async function getEstatesByAgentId(
+  agentId: string,
+): Promise<EstatePreview[]> {
+  const estates = await db
+    .select()
+    .from(estate)
+    .where(eq(estate.brokerId, agentId));
 
-export async function getEstateByFilters(filters: string) {
-  const estates = await db.select().from(estate);
-
-  const result = [];
+  const result: EstatePreview[] = [];
 
   for (const e of estates) {
     const photos = await db

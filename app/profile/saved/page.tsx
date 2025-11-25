@@ -5,15 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import PropertyPreviewCard from "@/components/Elements/PropertyPreviewCard";
 import { getSavedEstate } from "@/lib/actions/estate/getSavedEstate";
-import { EstatePreview } from "@/app/search/results/page";
+import { EstatePreview } from "@/lib/actions/estate/searchEstate";
 
 const ITEMS_PER_PAGE = 20;
 
 export default function SavedPage() {
   const params = useSearchParams();
   const router = useRouter();
-
-  const userId = "USER-123";
 
   const [properties, setProperties] = useState<EstatePreview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +29,7 @@ export default function SavedPage() {
     }
 
     load();
-  }, [userId]);
+  }, []);
 
   const totalItems = properties.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
@@ -45,7 +43,7 @@ export default function SavedPage() {
   function goToPage(newPage: number) {
     const newParams = new URLSearchParams(params.toString());
     newParams.set("page", String(newPage));
-    router.replace(`/saved?${newParams.toString()}`);
+    router.replace(`/profile/saved?${newParams.toString()}`);
   }
 
   return (

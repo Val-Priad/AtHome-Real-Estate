@@ -185,7 +185,10 @@ export const vicinityItemSchema = z.object({
 });
 
 export const vicinitySchema = z
-  .record(z.enum(vicinityTypeEnum.enumValues), z.array(vicinityItemSchema))
+  .record(
+    z.enum(vicinityTypeEnum.enumValues),
+    z.array(vicinityItemSchema).optional(),
+  )
   .optional();
 
 export const InsertFormSchema = z.object({
