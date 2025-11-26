@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { users } from "@/db/schema";
 import { and, eq, isNotNull, ne } from "drizzle-orm";
 
-export async function getAllBrokers() {
+export async function getAllAgents() {
   const brokers = await db
     .select({ id: users.id, name: users.name })
     .from(users)

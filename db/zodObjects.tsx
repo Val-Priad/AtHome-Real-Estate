@@ -29,7 +29,7 @@ import {
 
 export const estateSchema = z.object({
   // sellerId: z.string().optional(),
-  brokerId: z.string(),
+  brokerId: z.string().optional(),
 
   category: z.enum(estateCategoryEnum.enumValues, { error: "Required" }),
   operationType: z.enum(operationTypeEnum.enumValues, { error: "Required" }),
@@ -203,7 +203,7 @@ export type InsertFormSchema = z.infer<typeof InsertFormSchema>;
 export const defaultInsertFormValues: InsertFormSchema = {
   estate: {
     // sellerId: 0,
-    brokerId: "",
+    // brokerId: "",
 
     category: estateCategoryEnum.enumValues[0],
     operationType: operationTypeEnum.enumValues[0],

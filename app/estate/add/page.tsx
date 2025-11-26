@@ -48,7 +48,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import generateDescription from "@/lib/api/generateDescription";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -60,7 +60,7 @@ import { Label } from "@/components/ui/label";
 import { formatErrors } from "./components/formatErrors";
 import { insertEstate } from "@/lib/actions/estate/addEstate";
 import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
-import { getAllBrokers } from "@/lib/actions/user/getAllAgents";
+import { getAllAgents } from "@/lib/actions/user/getAllAgents";
 import VicinityTabs from "@/components/Elements/VicinityTabs";
 import { redirect, useSearchParams } from "next/navigation";
 import { getEstateById } from "@/lib/actions/estate/getEstateById";
@@ -76,12 +76,13 @@ function Page() {
   const MAX_VIDEO_SIZE_MB = 50;
   const MAX_VIDEO_DURATION_SEC = 120;
   const MAX_IMAGE_SIZE_MB = 10;
+  const [currentRoleIsUser, setCurrentRoleIsUser] = useState(true);
+  const [currentRoleIsAgent, setCurrentRoleIsAgent] = useState(true);
   const [tabDescriptionValue, setTabDescriptionValue] = useState("ua");
   const [tabVicinityValue, setTabVicinityValue] = useState("Closest");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSearchingVicinity, setIsSearchingVicinity] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingEstate, setIsLoadingEstate] = useState(false);
   const searchParams = useSearchParams();
   const estateId = searchParams.get("id");
   const isEditMode = estateId !== null;
@@ -95,10 +96,8 @@ function Page() {
     if (!estateId) return;
 
     async function loadEstate() {
-      setIsLoadingEstate(true);
-
       const user = await getCurrentUser();
-      if (user?.role !== "admin") {
+      if (user?.role === "user") {
         redirect("/not-found");
       }
       const data = await getEstateById(Number(estateId));
@@ -106,8 +105,6 @@ function Page() {
       const formValues = convertEstateResponseToFormValues(data);
 
       form.reset(formValues);
-
-      setIsLoadingEstate(false);
     }
 
     loadEstate();
@@ -115,16 +112,30 @@ function Page() {
 
   const category = form.watch("estate.category");
   const vicinity = form.watch("vicinity");
-  const [brokers, setBrokers] = useState<{ id: string; name: string | null }[]>(
+  const [agents, setAgents] = useState<{ id: string; name: string | null }[]>(
     [],
   );
 
   useEffect(() => {
     async function load() {
-      const result = await getAllBrokers();
-      setBrokers(result);
+      const result = await getAllAgents();
+      setAgents(result);
     }
     load();
+  }, []);
+
+  useEffect(() => {
+    async function hideAgents() {
+      const user = await getCurrentUser();
+      if (user?.role === "user") {
+        setCurrentRoleIsUser(true);
+        setCurrentRoleIsAgent(false);
+      } else if (user?.role === "agent") {
+        setCurrentRoleIsAgent(true);
+        setCurrentRoleIsUser(false);
+      }
+    }
+    hideAgents();
   }, []);
 
   async function onSubmit(values: z.infer<typeof InsertFormSchema>) {
@@ -150,7 +161,9 @@ function Page() {
             resolve(
               isEditMode
                 ? "Estate updated successfully"
-                : "Estate created successfully",
+                : currentRoleIsUser
+                  ? "Estate send, and waits for confirmation"
+                  : "Estate created successfully",
             );
           } else {
             if ("error" in response) reject(response.error || "Unknown error");
@@ -288,7 +301,7 @@ function Page() {
 
       <form
         onSubmit={form.handleSubmit(
-          (values) => {
+          (values: z.infer<typeof InsertFormSchema>) => {
             onSubmit(values);
           },
           (errors) => {
@@ -299,37 +312,43 @@ function Page() {
       >
         <div className="space-y-3">
           <FieldGroup>
-            <Controller
-              name="estate.brokerId"
-              control={form.control}
-              render={({ field: { onChange, ...field }, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Broker</FieldLabel>
+            {currentRoleIsUser || currentRoleIsAgent || (
+              <Controller
+                name="estate.brokerId"
+                control={form.control}
+                render={({ field: { onChange, ...field }, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Broker</FieldLabel>
 
-                  <Select {...field} onValueChange={(value) => onChange(value)}>
-                    <SelectTrigger
-                      aria-invalid={fieldState.invalid}
-                      id={field.name}
-                      onBlur={field.onBlur}
+                    <Select
+                      {...field}
+                      onValueChange={(value) => onChange(value)}
                     >
-                      <SelectValue placeholder="Select broker" />
-                    </SelectTrigger>
+                      <SelectTrigger
+                        aria-invalid={fieldState.invalid}
+                        id={field.name}
+                        onBlur={field.onBlur}
+                      >
+                        <SelectValue placeholder="Select broker" />
+                      </SelectTrigger>
 
-                    <SelectContent>
-                      {brokers.map((broker) => (
-                        <SelectItem key={broker.id} value={broker.id}>
-                          {broker.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                      <SelectContent>
+                        {agents.map((broker) => (
+                          <SelectItem key={broker.id} value={broker.id}>
+                            {broker.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            )}
+
             <Controller
               name="estate.category"
               control={form.control}

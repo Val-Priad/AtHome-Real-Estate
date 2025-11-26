@@ -32,7 +32,8 @@ export async function getEstateTable() {
       createdAt: estate.createdAt,
       expiresAt: estate.expiresAt,
       status: estate.status,
-      brokerName: users.name,
+      agentName: users.name,
+      agentId: users.id,
     })
     .from(estate)
 
@@ -57,7 +58,8 @@ export async function getEstateTable() {
       usableArea: row.usableArea,
       region: row.region,
 
-      broker: row.brokerName ? `${row.brokerName}` : "No broker",
+      agentName: row.agentName ? `${row.agentName}` : "No broker",
+      agentId: row.agentId,
 
       createdAt: row.createdAt,
       expiresAt: row.expiresAt,

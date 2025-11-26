@@ -18,9 +18,23 @@ import {
 } from "@/db/schema";
 import { z } from "zod";
 import { InsertFormSchema } from "@/db/zodObjects";
+import { auth } from "@/auth";
 
 export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
   try {
+    const session = await auth();
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const status =
+      currentUser.role === "user"
+        ? ("Suggested" as const)
+        : ("Active" as const);
+    const sellerId = currentUser.role === "user" ? currentUser.id : null;
+
     return await db.transaction(async (tx) => {
       const expiresAt = new Date(
         values.estate.readyDate.getTime() +
@@ -28,7 +42,7 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
       );
 
       const insertData = {
-        // sellerId: values.estate.sellerId ?? null,
+        sellerId: sellerId,
         brokerId: values.estate.brokerId ?? null,
         category: values.estate.category,
         operationType: values.estate.operationType,
@@ -53,6 +67,7 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
         region: values.estate.region,
         latitude: values.estate.latitude,
         longitude: values.estate.longitude,
+        status: status,
       };
 
       const [estateRecord] = await tx

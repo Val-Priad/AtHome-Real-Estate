@@ -4,9 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, UserCog, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/actions/user/getCurrentUser";
 
 export default function Sidebar() {
   const pathname = usePathname();
+
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      const user = await getCurrentUser();
+      setRole(user?.role ?? null);
+    }
+    load();
+  }, []);
 
   const links = [
     {
@@ -26,6 +38,15 @@ export default function Sidebar() {
     },
   ];
 
+  const filteredLinks =
+    role === "agent"
+      ? links.filter((l) => l.label === "Property Management")
+      : links;
+
+  if (role === null || role === "user") {
+    return null;
+  }
+
   return (
     <aside className="bg-background w-64 rounded-2xl border-r">
       <div className="p-6">
@@ -34,7 +55,7 @@ export default function Sidebar() {
 
       <nav className="px-3">
         <ul className="flex flex-col gap-1">
-          {links.map(({ href, label, icon: Icon }) => {
+          {filteredLinks.map(({ href, label, icon: Icon }) => {
             const isActive = pathname.startsWith(href);
 
             return (

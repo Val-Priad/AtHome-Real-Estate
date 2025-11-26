@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, gt, gte, inArray, lte } from "drizzle-orm";
+import { and, eq, gt, gte, inArray, isNotNull, lte } from "drizzle-orm";
 import {
   estate,
   estateApartment,
@@ -278,6 +278,14 @@ export async function searchEstate(
     //
 
     where.push(inArray(estate.status, ["Active", "Expiring"]));
+
+    //
+    // ============================
+    //  ESTATES WITH AGENT
+    // ============================
+    //
+
+    where.push(isNotNull(estate.brokerId));
 
     //
     // ============================

@@ -23,15 +23,15 @@ export default async function ClientNavigation() {
       <CgMenu className="text-brand-10 h-8 w-8 md:hidden" />
 
       <ul className="text-body xl:text-h5 hidden list-none gap-7 font-bold md:flex 2xl:flex 2xl:gap-20">
-        {user?.role === "admin" && (
+        {(user?.role === "admin" || user?.role === "agent") && (
           <li className="duration-300 hover:-translate-y-1">
             <Link href="/admin/estate">Admin</Link>
           </li>
         )}
 
-        {user && user?.role !== "admin" && (
+        {user?.role === "user" && (
           <li className="duration-300 hover:-translate-y-1">
-            <Link href="/sell-with-us">Sell With Us</Link>
+            <Link href="/estate/add">Sell With Us</Link>
           </li>
         )}
 

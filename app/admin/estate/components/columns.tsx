@@ -15,7 +15,8 @@ export type EstateRow = {
   price: number;
   usableArea: number | null;
   region: string;
-  broker: string;
+  agentName: string;
+  agentId: string | null;
   createdAt: Date;
   expiresAt: Date;
   status: string | null;
