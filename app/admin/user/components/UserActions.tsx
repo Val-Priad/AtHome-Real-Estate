@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 
 import {
   DropdownMenu,
@@ -24,14 +24,15 @@ import {
 
 import { MoreHorizontal } from "lucide-react";
 import { deleteUser } from "@/lib/actions/user/deleteUser";
+import { promoteUserToAgent } from "@/lib/actions/user/promoteUserToAgent";
 
 export function UserActions({ id }: { id: string }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   async function handleDelete() {
     const res = await deleteUser(id);
-    setOpen(false);
+    setOpenDelete(false);
     router.refresh();
 
     if (res.success) {
@@ -41,8 +42,20 @@ export function UserActions({ id }: { id: string }) {
     }
   }
 
+  async function handlePromote() {
+    const res = await promoteUserToAgent(id);
+    router.refresh();
+
+    if (res.success) {
+      toast.success("User promoted to agent!");
+    } else {
+      toast.error(res.message || "Failed to promote user");
+    }
+  }
+
   return (
     <>
+      <Toaster richColors position="top-center" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="rounded p-1 hover:bg-gray-100">
@@ -51,22 +64,20 @@ export function UserActions({ id }: { id: string }) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/users/${id}`)}
-          >
-            Edit
+          <DropdownMenuItem onClick={handlePromote}>
+            Promote to agent
           </DropdownMenuItem>
 
           <DropdownMenuItem
             className="text-red-600"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpenDelete(true)}
           >
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog open={openDelete} onOpenChange={setOpenDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete user?</AlertDialogTitle>
@@ -78,6 +89,7 @@ export function UserActions({ id }: { id: string }) {
 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
+
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700"
