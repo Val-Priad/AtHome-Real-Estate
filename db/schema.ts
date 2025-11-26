@@ -63,8 +63,6 @@ export const operationTypeEnum = pgEnum("OPERATION_TYPE_ENUM", [
   "Lease",
 ]);
 
-export const currencyEnum = pgEnum("CURRENCY_ENUM", ["USD", "EUR"]);
-
 export const priceUnitEnum = pgEnum("PRICE_UNIT_ENUM", [
   "per property",
   "per month",
@@ -253,6 +251,14 @@ export const circuitBreakerEnum = pgEnum("CIRCUIT_BREAKER_ENUM", [
   "Other",
 ]);
 
+export const estateStatusEnum = pgEnum("ESTATE_STATUS_ENUM", [
+  "Active",
+  "Expired",
+  "Expiring",
+  "Archived",
+  "Suggested",
+]);
+
 // ==========================
 // USERS / BROKERS
 // ==========================
@@ -360,7 +366,6 @@ export const estate = pgTable("estate", {
   expiresAt: timestamp("expires_at").notNull(), // TODO automatically calculated not in ui
 
   price: numeric("price", { precision: 10, scale: 2 }).notNull(), // input field
-  currency: currencyEnum("currency").notNull(), // dropdown
   priceUnit: priceUnitEnum("price_unit").notNull(), // dropdown
   costOfLiving: numeric("cost_of_living", { precision: 10, scale: 2 }), //  input field
   commission: numeric("commission", { precision: 10, scale: 2 }), //  input field
@@ -375,6 +380,7 @@ export const estate = pgTable("estate", {
 
   createdAt: timestamp("created_at").defaultNow().notNull(), // TODO automatically set
   updatedAt: timestamp("updated_at").defaultNow().notNull(), // TODO automatically set
+  status: estateStatusEnum("status").default("Active"),
 });
 
 // ==========================
@@ -467,11 +473,11 @@ export const estateMedia = pgTable("estate_media", {
 });
 
 // ==========================
-// WISH LIST
+// SAVED
 // ==========================
 
-export const wishList = pgTable(
-  "wish_list",
+export const savedEstate = pgTable(
+  "saved_estate",
   {
     userId: text("user_id").references(() => users.id, {
       onDelete: "cascade",

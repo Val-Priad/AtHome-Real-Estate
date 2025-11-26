@@ -15,7 +15,6 @@ import {
   buildingConditionEnum,
   buildingTypeEnum,
   circuitBreakerEnum,
-  currencyEnum,
   energyClassEnum,
   estateCategoryEnum,
   flatClassEnum,
@@ -61,8 +60,13 @@ import { Label } from "@/components/ui/label";
 import { formatErrors } from "./components/formatErrors";
 import { insertEstate } from "@/lib/actions/estate/addEstate";
 import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
-import { getAllBrokers } from "@/lib/actions/user/getAllBrokers";
+import { getAllBrokers } from "@/lib/actions/user/getAllAgents";
 import VicinityTabs from "@/components/Elements/VicinityTabs";
+import { redirect, useSearchParams } from "next/navigation";
+import { getEstateById } from "@/lib/actions/estate/getEstateById";
+import { convertEstateResponseToFormValues } from "./components/convertEstateToForm";
+import { getCurrentUser } from "@/lib/actions/user/getCurrentUser";
+import { updateEstate } from "@/lib/actions/estate/updateEstate";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
@@ -77,11 +81,37 @@ function Page() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSearchingVicinity, setIsSearchingVicinity] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingEstate, setIsLoadingEstate] = useState(false);
+  const searchParams = useSearchParams();
+  const estateId = searchParams.get("id");
+  const isEditMode = estateId !== null;
 
   const form = useForm({
     resolver: zodResolver(InsertFormSchema),
     defaultValues: defaultInsertFormValues,
   });
+
+  useEffect(() => {
+    if (!estateId) return;
+
+    async function loadEstate() {
+      setIsLoadingEstate(true);
+
+      const user = await getCurrentUser();
+      if (user?.role !== "admin") {
+        redirect("/not-found");
+      }
+      const data = await getEstateById(Number(estateId));
+
+      const formValues = convertEstateResponseToFormValues(data);
+
+      form.reset(formValues);
+
+      setIsLoadingEstate(false);
+    }
+
+    loadEstate();
+  }, [estateId, form]);
 
   const category = form.watch("estate.category");
   const vicinity = form.watch("vicinity");
@@ -102,30 +132,41 @@ function Page() {
       new Promise(async (resolve, reject) => {
         try {
           setIsSubmitting(true);
-          const uploadedItems = await uploadFilesToS3();
 
+          const uploadedItems = await uploadFilesToS3();
           const dataToSubmit = { ...values, media: uploadedItems };
 
-          const response = await insertEstate(dataToSubmit);
+          let response;
+
+          if (isEditMode) {
+            response = await updateEstate(Number(estateId), dataToSubmit);
+          } else {
+            response = await insertEstate(dataToSubmit);
+          }
 
           setIsSubmitting(false);
+
           if (response.success) {
-            resolve("Estate created successfully! Redirecting...");
-          } else if ("error" in response) {
-            reject(`Failed: ${response.error}`);
+            resolve(
+              isEditMode
+                ? "Estate updated successfully"
+                : "Estate created successfully",
+            );
           } else {
-            reject("Unknown error");
+            if ("error" in response) reject(response.error || "Unknown error");
           }
         } catch (err) {
           console.error(err);
           setIsSubmitting(false);
-          reject("Upload or save failed");
+          reject("Unexpected error occurred");
         }
       }),
       {
-        loading: "Uploading files & saving estate...",
-        success: (message) => message as ReactNode,
-        error: (err) => err || "Unexpected error occurred",
+        loading: isEditMode
+          ? "Updating estate..."
+          : "Uploading and creating...",
+        success: (msg) => msg as string,
+        error: (err) => err,
       },
     );
   }
@@ -199,13 +240,6 @@ function Page() {
     return uploadedItems;
   }
 
-  function alertData() {
-    const values = form.getValues();
-    console.log(form.getValues().media);
-
-    alert(JSON.stringify(values));
-  }
-
   async function handleVicinitySearch() {
     setIsSearchingVicinity(true);
     const result = await fetchVicinity(
@@ -252,12 +286,6 @@ function Page() {
     <div className="flex justify-center px-2">
       <Toaster position="top-center" richColors />
 
-      <button
-        className="fixed top-4 right-4 bg-amber-400"
-        onClick={() => alertData()}
-      >
-        Show State
-      </button>
       <form
         onSubmit={form.handleSubmit(
           (values) => {
@@ -465,35 +493,6 @@ function Page() {
                     </SelectTrigger>
                     <SelectContent>
                       {furnishedEnum.enumValues.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name="estate.currency"
-              control={form.control}
-              render={({ field: { onChange, ...field }, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={field.name}>Currency</FieldLabel>
-                  <Select {...field} onValueChange={onChange}>
-                    <SelectTrigger
-                      aria-invalid={fieldState.invalid}
-                      onBlur={field.onBlur}
-                      id={field.name}
-                    >
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {currencyEnum.enumValues.map((status) => (
                         <SelectItem key={status} value={status}>
                           {status}
                         </SelectItem>
@@ -759,16 +758,25 @@ function Page() {
             <Controller
               name="estate.advertLifetime"
               control={form.control}
-              render={({ field, fieldState }) => (
+              render={({ field: { onChange, ...field }, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>Advert Lifetime</FieldLabel>
-                  <Input
-                    {...field}
-                    id={field.name}
-                    aria-invalid={fieldState.invalid}
-                    value={field.value as number}
-                  />
-
+                  <Select {...field} onValueChange={onChange}>
+                    <SelectTrigger
+                      aria-invalid={fieldState.invalid}
+                      onBlur={field.onBlur}
+                      id={field.name}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {["7", "30", "90", "180", "365"].map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

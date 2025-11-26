@@ -1,7 +1,6 @@
 import { Accordion } from "@/components/ui/accordion";
 import AccordionSection from "./AccordionSection";
 import { EstateData } from "@/lib/actions/estate/getEstateById";
-import { getCurrencySign } from "@/utils/getCurrencySign";
 
 export function Accordions({ estateData }: { estateData: EstateData }) {
   if (!estateData) return null;
@@ -28,23 +27,11 @@ export function Accordions({ estateData }: { estateData: EstateData }) {
       <AccordionSection
         title="Pricing & Costs"
         fields={[
-          [
-            "Price",
-            `${e.price} ${getCurrencySign(e.currency)} (${e.priceUnit})`,
-          ],
-          [
-            "Cost of Living",
-            `${e.costOfLiving ?? "-"} ${getCurrencySign(e.currency)}`,
-          ],
-          [
-            "Commission",
-            `${e.commission ?? "-"} ${getCurrencySign(e.currency)}`,
-          ],
+          ["Price", `${e.price} ₴)} (${e.priceUnit})`],
+          ["Cost of Living", `${e.costOfLiving ?? "-"} ₴`],
+          ["Commission", `${e.commission ?? "-"} ₴`],
           ["Commission Paid by Owner", e.commissionPaidByOwner ? "Yes" : "No"],
-          [
-            "Refundable Deposit",
-            `${e.refundableDeposit ?? "-"} ${getCurrencySign(e.currency)}`,
-          ],
+          ["Refundable Deposit", `${e.refundableDeposit ?? "-"} ₴`],
         ]}
       />
 

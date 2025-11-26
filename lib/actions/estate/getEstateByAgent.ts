@@ -2,41 +2,42 @@
 
 import { db } from "@/lib/db";
 import { estate, estateMedia } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { EstatePreview } from "./searchEstate";
 
 export async function getEstatesByAgentId(
   agentId: string,
 ): Promise<EstatePreview[]> {
-  const estates = await db
-    .select()
+  const rows = await db
+    .select({
+      id: estate.id,
+      category: estate.category,
+      usableArea: estate.usableArea,
+      operationType: estate.operationType,
+      price: estate.price,
+      street: estate.street,
+      city: estate.city,
+
+      image: sql<string | null>`
+        (
+          SELECT em.url
+          FROM ${estateMedia} em
+          WHERE em.estate_id = ${estate.id}
+          ORDER BY em.is_main DESC, em.id ASC
+          LIMIT 1
+        )
+      `,
+    })
     .from(estate)
     .where(eq(estate.brokerId, agentId));
 
-  const result: EstatePreview[] = [];
-
-  for (const e of estates) {
-    const photos = await db
-      .select()
-      .from(estateMedia)
-      .where(eq(estateMedia.estateId, e.id));
-
-    let image = photos.find((p) => p.isMain === true)?.url;
-
-    if (!image && photos.length > 0) {
-      image = photos[0].url;
-    }
-
-    result.push({
-      id: e.id,
-      property_type: e.category,
-      usable_area: e.usableArea,
-      offer_type: e.operationType,
-      price: Number(e.price),
-      address: `${e.street}, ${e.city}`,
-      image: image ?? null,
-    });
-  }
-
-  return result;
+  return rows.map((e) => ({
+    id: e.id,
+    property_type: e.category,
+    usable_area: e.usableArea,
+    offer_type: e.operationType,
+    price: Number(e.price),
+    address: `${e.street}, ${e.city}`,
+    image: e.image ?? null,
+  }));
 }

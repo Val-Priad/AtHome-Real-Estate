@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  addToWishlist,
-  isInWishlist,
-  removeFromWishlist,
-} from "@/lib/actions/estate/wishList";
+  addToSaved,
+  isInSaved,
+  removeFromSaved,
+} from "@/lib/actions/estate/savedEstate";
 import { useState, useEffect } from "react";
 import { IoBookmarks } from "react-icons/io5";
 
@@ -20,7 +20,7 @@ export default function WishlistButton({ estateId }: WishlistButtonProps) {
   useEffect(() => {
     async function checkSaved() {
       try {
-        const inWishlist = await isInWishlist(estateId);
+        const inWishlist = await isInSaved(estateId);
         setSaved(inWishlist);
       } catch (err) {
         console.error(err);
@@ -36,10 +36,10 @@ export default function WishlistButton({ estateId }: WishlistButtonProps) {
     setLoading(true);
     try {
       if (saved) {
-        await removeFromWishlist(estateId);
+        await removeFromSaved(estateId);
         setSaved(false);
       } else {
-        await addToWishlist(estateId);
+        await addToSaved(estateId);
         setSaved(true);
       }
     } catch (err) {

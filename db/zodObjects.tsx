@@ -6,7 +6,6 @@ import {
   energyClassEnum,
   roadTypeEnum,
   furnishedEnum,
-  currencyEnum,
   priceUnitEnum,
   regionEnum,
   houseCategoryEnum,
@@ -40,7 +39,6 @@ export const estateSchema = z.object({
   energyClass: z.enum(energyClassEnum.enumValues, { error: "Required" }),
   roadType: z.enum(roadTypeEnum.enumValues, { error: "Required" }),
   furnished: z.enum(furnishedEnum.enumValues, { error: "Required" }),
-  currency: z.enum(currencyEnum.enumValues, { error: "Required" }),
   priceUnit: z.enum(priceUnitEnum.enumValues, { error: "Required" }),
   region: z.enum(regionEnum.enumValues, { error: "Required" }),
 
@@ -61,11 +59,9 @@ export const estateSchema = z.object({
   commissionPaidByOwner: z.boolean().default(false),
 
   readyDate: z.coerce.date(),
-  advertLifetime: z.coerce
-    .number()
-    .int()
-    .positive()
-    .refine((val) => [7, 30, 90, 180, 365].includes(val), {
+  advertLifetime: z
+    .string()
+    .refine((val) => ["7", "30", "90", "180", "365"].includes(val), {
       message: "Invalid advert lifetime",
     }),
 
@@ -215,7 +211,6 @@ export const defaultInsertFormValues: InsertFormSchema = {
     energyClass: energyClassEnum.enumValues[0],
     roadType: roadTypeEnum.enumValues[0],
     furnished: furnishedEnum.enumValues[0],
-    currency: currencyEnum.enumValues[0],
     priceUnit: priceUnitEnum.enumValues[0],
     region: regionEnum.enumValues[0],
 
@@ -230,7 +225,7 @@ export const defaultInsertFormValues: InsertFormSchema = {
     commissionPaidByOwner: false,
 
     readyDate: new Date(),
-    advertLifetime: 7,
+    advertLifetime: "7",
 
     city: "",
     street: "",

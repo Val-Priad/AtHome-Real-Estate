@@ -273,6 +273,14 @@ export async function searchEstate(
 
     //
     // ============================
+    // ONLY ACTIVE estates
+    // ============================
+    //
+
+    where.push(inArray(estate.status, ["Active", "Expiring"]));
+
+    //
+    // ============================
     // SELECT estates
     // ============================
     //

@@ -25,7 +25,13 @@ export default async function ClientNavigation() {
       <ul className="text-body xl:text-h5 hidden list-none gap-7 font-bold md:flex 2xl:flex 2xl:gap-20">
         {user?.role === "admin" && (
           <li className="duration-300 hover:-translate-y-1">
-            <Link href="/admin">Admin</Link>
+            <Link href="/admin/estate">Admin</Link>
+          </li>
+        )}
+
+        {user && user?.role !== "admin" && (
+          <li className="duration-300 hover:-translate-y-1">
+            <Link href="/sell-with-us">Sell With Us</Link>
           </li>
         )}
 
@@ -34,9 +40,7 @@ export default async function ClientNavigation() {
             <li className="duration-300 hover:-translate-y-1">
               <Link href="/profile/saved">Saved</Link>
             </li>
-            <li className="duration-300 hover:-translate-y-1">
-              <Link href="/sell-with-us">Sell With Us</Link>
-            </li>
+
             <li className="cursor-pointer">
               <UserMenu user={user} />
             </li>

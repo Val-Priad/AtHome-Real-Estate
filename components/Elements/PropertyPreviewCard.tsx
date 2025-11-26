@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import { EstatePreview } from "@/lib/actions/estate/getEstateByFilters";
 import Link from "next/link";
+import { EstatePreview } from "@/lib/actions/estate/searchEstate";
 
 interface Props {
   property: EstatePreview;
@@ -44,7 +44,7 @@ const PropertyPreviewCard: React.FC<Props> = ({ property: estate }) => {
           </p>
 
           <p className="text-2xl font-semibold text-gray-900 transition-transform duration-300 group-hover:scale-[1.03]">
-            {estate.price.toLocaleString("en-US")} Kč
+            {estate.price.toLocaleString("en-US")} ₴
           </p>
         </div>
       </Link>

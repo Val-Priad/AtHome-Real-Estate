@@ -4,22 +4,27 @@ import { db } from "@/lib/db";
 import {
   estate,
   estateApartment,
-  estateElectricity,
-  estateHeatingElement,
-  estateHeatingSource,
   estateHouse,
+  estateHeatingSource,
+  estateHeatingElement,
+  estateElectricity,
   estateInternet,
-  estateMedia,
   estateTelecommunication,
+  estateWater,
   estateTranslation,
   estateVicinity,
-  estateWater,
+  estateMedia,
   vicinityTypeEnum,
 } from "@/db/schema";
-import { z } from "zod";
-import { InsertFormSchema } from "@/db/zodObjects";
 
-export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
+import { InsertFormSchema } from "@/db/zodObjects";
+import { z } from "zod";
+import { eq } from "drizzle-orm";
+
+export async function updateEstate(
+  estateId: number,
+  values: z.infer<typeof InsertFormSchema>,
+) {
   try {
     return await db.transaction(async (tx) => {
       const expiresAt = new Date(
@@ -27,42 +32,51 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
           Number(values.estate.advertLifetime) * 24 * 60 * 60 * 1000,
       );
 
-      const insertData = {
-        // sellerId: values.estate.sellerId ?? null,
-        brokerId: values.estate.brokerId ?? null,
-        category: values.estate.category,
-        operationType: values.estate.operationType,
-        buildingCondition: values.estate.buildingCondition,
-        energyClass: values.estate.energyClass,
-        usableArea: values.estate.usableArea ?? null,
-        totalFloorArea: values.estate.totalFloorArea ?? null,
-        roadType: values.estate.roadType,
-        furnished: values.estate.furnished,
-        easyAccess: values.estate.easyAccess,
-        readyDate: values.estate.readyDate.toISOString().split("T")[0],
-        advertLifetime: Number(values.estate.advertLifetime),
-        expiresAt,
-        price: values.estate.price?.toFixed(2),
-        priceUnit: values.estate.priceUnit,
-        costOfLiving: values.estate.costOfLiving?.toFixed(2) ?? null,
-        commission: values.estate.commission?.toFixed(2) ?? null,
-        commissionPaidByOwner: values.estate.commissionPaidByOwner,
-        refundableDeposit: values.estate.refundableDeposit?.toFixed(2) ?? null,
-        city: values.estate.city,
-        street: values.estate.street,
-        region: values.estate.region,
-        latitude: values.estate.latitude,
-        longitude: values.estate.longitude,
-      };
+      await tx
+        .update(estate)
+        .set({
+          brokerId: values.estate.brokerId ?? null,
+          category: values.estate.category,
+          operationType: values.estate.operationType,
+          buildingCondition: values.estate.buildingCondition,
+          energyClass: values.estate.energyClass,
+          usableArea: values.estate.usableArea ?? null,
+          totalFloorArea: values.estate.totalFloorArea ?? null,
+          roadType: values.estate.roadType,
+          furnished: values.estate.furnished,
+          easyAccess: values.estate.easyAccess,
+          readyDate: values.estate.readyDate.toISOString().split("T")[0],
+          advertLifetime: Number(values.estate.advertLifetime),
+          expiresAt,
+          price: values.estate.price.toFixed(2),
+          priceUnit: values.estate.priceUnit,
+          costOfLiving: values.estate.costOfLiving
+            ? values.estate.costOfLiving.toFixed(2)
+            : null,
+          commission: values.estate.commission
+            ? values.estate.commission.toFixed(2)
+            : null,
+          commissionPaidByOwner: values.estate.commissionPaidByOwner,
+          refundableDeposit: values.estate.refundableDeposit
+            ? values.estate.refundableDeposit.toFixed(2)
+            : null,
+          city: values.estate.city,
+          street: values.estate.street,
+          region: values.estate.region,
+          latitude: values.estate.latitude,
+          longitude: values.estate.longitude,
+          updatedAt: new Date(),
+        })
+        .where(eq(estate.id, estateId));
 
-      const [estateRecord] = await tx
-        .insert(estate)
-        .values(insertData)
-        .returning();
+      await tx
+        .delete(estateApartment)
+        .where(eq(estateApartment.estateId, estateId));
+      await tx.delete(estateHouse).where(eq(estateHouse.estateId, estateId));
 
       if (values.estate.category === "Apartment") {
         await tx.insert(estateApartment).values({
-          estateId: estateRecord.id,
+          estateId,
           flatClass: values.estateApartment.flatClass ?? null,
           buildingType: values.estateApartment.buildingType ?? null,
           apartmentPlan: values.estateApartment.apartmentPlan ?? null,
@@ -79,7 +93,7 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
 
       if (values.estate.category === "House") {
         await tx.insert(estateHouse).values({
-          estateId: estateRecord.id,
+          estateId,
           houseCategory: values.estateHouse.houseCategory ?? null,
           roomCount: values.estateHouse.roomCount ?? null,
           houseType: values.estateHouse.houseType ?? null,
@@ -114,58 +128,69 @@ export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
       ] as const;
 
       for (const [key, table, column] of multiselectMap) {
+        await tx.delete(table).where(eq(table.estateId, estateId));
+
         const items = values.multiselect[key];
         if (items?.length) {
-          const rows = items.map((value) => ({
-            estateId: estateRecord.id,
-            [column]: value,
-          }));
-          await tx.insert(table).values(rows);
+          await tx.insert(table).values(
+            items.map((value) => ({
+              estateId,
+              [column]: value,
+            })),
+          );
         }
       }
 
-      const translations = (["ua", "en"] as const).map((lang) => ({
-        estateId: estateRecord.id,
-        langCode: lang,
-        title: values.translations.title[lang],
-        description: values.translations.description[lang],
-      }));
-      await tx.insert(estateTranslation).values(translations);
+      await tx
+        .delete(estateTranslation)
+        .where(eq(estateTranslation.estateId, estateId));
+
+      await tx.insert(estateTranslation).values(
+        (["ua", "en"] as const).map((lang) => ({
+          estateId,
+          langCode: lang,
+          title: values.translations.title[lang],
+          description: values.translations.description[lang],
+        })),
+      );
+
+      await tx
+        .delete(estateVicinity)
+        .where(eq(estateVicinity.estateId, estateId));
 
       if (values.vicinity) {
         const vicinityRows = Object.entries(values.vicinity).flatMap(
-          ([type, items]) => {
-            if (!items) {
-              return [];
-            }
-            return items.map((item) => ({
-              estateId: estateRecord.id,
+          ([type, items]) =>
+            items?.map((item) => ({
+              estateId,
               type: type as (typeof vicinityTypeEnum.enumValues)[number],
               name: item.name,
               latitude: item.latitude,
               longitude: item.longitude,
               distanceM: item.distanceM,
-            }));
-          },
+            })) ?? [],
         );
+
         if (vicinityRows.length) {
           await tx.insert(estateVicinity).values(vicinityRows);
         }
       }
 
-      if (values.media?.length) {
-        const mediaRows = values.media.map((m) => ({
-          estateId: estateRecord.id,
-          url: m.url,
-          alt: m.alt ?? null,
-          mediaType: m.type,
-          isMain: m.isMain,
-        }));
+      await tx.delete(estateMedia).where(eq(estateMedia.estateId, estateId));
 
-        await tx.insert(estateMedia).values(mediaRows);
+      if (values.media?.length) {
+        await tx.insert(estateMedia).values(
+          values.media.map((m) => ({
+            estateId,
+            url: m.url,
+            alt: m.alt ?? null,
+            mediaType: m.type,
+            isMain: m.isMain,
+          })),
+        );
       }
 
-      return { success: true, estateId: estateRecord.id };
+      return { success: true };
     });
   } catch (error) {
     return { success: false, error: (error as Error).message };

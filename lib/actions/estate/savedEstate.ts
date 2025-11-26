@@ -1,54 +1,54 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { wishList } from "@/db/schema";
+import { savedEstate } from "@/db/schema";
 import { auth } from "@/auth";
 import { and, eq } from "drizzle-orm";
 
-export async function addToWishlist(estateId: number) {
+export async function addToSaved(estateId: number) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Not authenticated");
   }
 
-  const exists = await isInWishlist(estateId);
+  const exists = await isInSaved(estateId);
   if (exists) {
     return;
   }
 
-  await db.insert(wishList).values({
+  await db.insert(savedEstate).values({
     userId: session.user.id,
     estateId: estateId,
   });
 }
 
-export async function removeFromWishlist(estateId: number) {
+export async function removeFromSaved(estateId: number) {
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("Not authenticated");
   }
 
   await db
-    .delete(wishList)
+    .delete(savedEstate)
     .where(
       and(
-        eq(wishList.userId, session.user.id),
-        eq(wishList.estateId, estateId),
+        eq(savedEstate.userId, session.user.id),
+        eq(savedEstate.estateId, estateId),
       ),
     );
 }
 
-export async function isInWishlist(estateId: number) {
+export async function isInSaved(estateId: number) {
   const session = await auth();
   if (!session?.user?.id) return false;
 
   const exists = await db
     .select()
-    .from(wishList)
+    .from(savedEstate)
     .where(
       and(
-        eq(wishList.userId, session.user.id),
-        eq(wishList.estateId, estateId),
+        eq(savedEstate.userId, session.user.id),
+        eq(savedEstate.estateId, estateId),
       ),
     );
 
