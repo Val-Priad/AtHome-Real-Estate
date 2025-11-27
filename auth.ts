@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Credentials from "next-auth/providers/credentials";
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import { eq } from "drizzle-orm";
 import { users } from "@/db/schema";
 import bcrypt from "bcrypt";
@@ -29,23 +29,23 @@ export const {
           typeof credentials.email !== "string" ||
           typeof credentials.password !== "string"
         ) {
-          throw new Error("Invalid credentials");
+          throw new CredentialsSignin("Invalid credentials");
         }
 
         const { email, password } = credentials;
 
         const user = await db.query.users.findFirst({
-          where: eq(users.email, email),
+          where: eq(users.email, email as string),
         });
 
         if (!user) {
-          throw new Error("User not found");
+          throw new CredentialsSignin("User not found");
         }
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
 
         if (!isValid) {
-          throw new Error("Invalid password");
+          throw new CredentialsSignin("Invalid password");
         }
 
         return {
@@ -53,6 +53,7 @@ export const {
           role: user.role,
           image: user.image,
           name: user.name,
+          email: user.email,
         };
       },
     }),
