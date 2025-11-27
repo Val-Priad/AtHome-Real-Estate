@@ -27,6 +27,10 @@ import {
   vicinityTypeEnum,
 } from "@/db/schema";
 
+const MAX_FOR_AREA = 999_999;
+const MAX_FOR_PRICE = 999_999_999;
+const MAX_FOR_FLOORS = 999;
+
 export const estateSchema = z.object({
   // sellerId: z.string().optional(),
   brokerId: z.string().optional(),
@@ -42,17 +46,27 @@ export const estateSchema = z.object({
   priceUnit: z.enum(priceUnitEnum.enumValues, { error: "Required" }),
   region: z.enum(regionEnum.enumValues, { error: "Required" }),
 
-  usableArea: z.coerce.number().positive("Must be positive").optional(),
-  totalFloorArea: z.coerce.number().positive("Must be positive").optional(),
-  price: z.coerce.number().positive("Must be positive"),
+  usableArea: z.coerce
+    .number()
+    .positive("Must be positive")
+    .max(MAX_FOR_AREA)
+    .optional(),
+  totalFloorArea: z.coerce
+    .number()
+    .positive("Must be positive")
+    .max(MAX_FOR_AREA)
+    .optional(),
+  price: z.coerce.number().positive("Must be positive").max(MAX_FOR_PRICE),
   costOfLiving: z.coerce
     .number()
     .nonnegative("Must be not negative")
+    .max(MAX_FOR_PRICE)
     .optional(),
   commission: z.coerce.number().positive("Must be positive").optional(),
   refundableDeposit: z.coerce
     .number()
     .nonnegative("Must be not negative")
+    .max(MAX_FOR_PRICE)
     .optional(),
 
   easyAccess: z.boolean().default(false),
@@ -97,11 +111,26 @@ export const estateHouseSchema = z.object({
     .min(1000, "Invalid year")
     .max(new Date().getFullYear(), "Cannot be in the future")
     .optional(),
-  floors: z.coerce.number().int().nonnegative().optional(),
-  undergroundFloors: z.coerce.number().int().nonnegative().optional(),
-  parkingLotsCount: z.coerce.number().int().nonnegative().optional(),
-  gardenArea: z.coerce.number().int().nonnegative().optional(),
-  buildingArea: z.coerce.number().int().nonnegative().optional(),
+  floors: z.coerce.number().int().nonnegative().max(MAX_FOR_FLOORS).optional(),
+  undergroundFloors: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_FLOORS)
+    .optional(),
+  parkingLotsCount: z.coerce.number().int().nonnegative().max(999).optional(),
+  gardenArea: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_AREA)
+    .optional(),
+  buildingArea: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_AREA)
+    .optional(),
 
   pool: z.boolean().default(false),
   cellar: z.boolean().default(false),
@@ -115,10 +144,30 @@ export const estateApartmentSchema = z.object({
   buildingType: z.enum(buildingTypeEnum.enumValues).optional(),
   apartmentPlan: z.enum(apartmentPlanEnum.enumValues).optional(),
 
-  floorNumber: z.coerce.number().int().nonnegative().optional(),
-  balconyArea: z.coerce.number().int().nonnegative().optional(),
-  loggiaArea: z.coerce.number().int().nonnegative().optional(),
-  terraceArea: z.coerce.number().int().nonnegative().optional(),
+  floorNumber: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_FLOORS)
+    .optional(),
+  balconyArea: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_AREA)
+    .optional(),
+  loggiaArea: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_AREA)
+    .optional(),
+  terraceArea: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(MAX_FOR_AREA)
+    .optional(),
 
   apartmentNumber: z.string().trim().max(255, "Too long").optional(),
 
