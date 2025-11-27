@@ -1,6 +1,6 @@
 import "@/styles/globals.css";
-import ClientNavigation from "@/components/layout/ClientNavigation";
 import type { Metadata } from "next";
+import NavigationContainer from "@/components/layout/NavigationContainer";
 
 export const metadata: Metadata = {
   title: "At Home: Estate Agency",
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ClientNavigation />
+        <NavigationContainer />
         {children}
       </body>
     </html>
