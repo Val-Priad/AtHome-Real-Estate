@@ -127,7 +127,10 @@ function Page() {
   useEffect(() => {
     async function hideAgents() {
       const user = await getCurrentUser();
-      if (user?.role === "user") {
+      if (user?.role === "admin") {
+        setCurrentRoleIsUser(false);
+        setCurrentRoleIsAgent(false);
+      } else if (user?.role === "user") {
         setCurrentRoleIsUser(true);
         setCurrentRoleIsAgent(false);
       } else if (user?.role === "agent") {
