@@ -105,25 +105,25 @@ export function Accordions({ estateData }: { estateData: EstateData }) {
           ],
           [
             "Water",
-            estateData.multiselect.water.map((x) => x.water).join(", "),
+            estateData.multiselect.water.map((x) => x.water).join(", ") || "-",
           ],
           [
             "Electricity",
             estateData.multiselect.electricity
               .map((x) => x.electricity)
-              .join(", "),
+              .join(", ") || "-",
           ],
           [
             "Telecommunication",
             estateData.multiselect.telecommunication
               .map((x) => x.telecommunication)
-              .join(", "),
+              .join(", ") || "-",
           ],
           [
             "Internet",
             estateData.multiselect.internet
               .map((x) => x.connectionType)
-              .join(", "),
+              .join(", ") || "-",
           ],
         ]}
       />
