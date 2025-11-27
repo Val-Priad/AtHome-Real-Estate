@@ -18,12 +18,11 @@ import {
 } from "@/db/schema";
 import { z } from "zod";
 import { InsertFormSchema } from "@/db/zodObjects";
-import { auth } from "@/auth";
+import { getCurrentUser } from "../user/getCurrentUser";
 
 export async function insertEstate(values: z.infer<typeof InsertFormSchema>) {
   try {
-    const session = await auth();
-    const currentUser = session?.user;
+    const currentUser = await getCurrentUser();
 
     if (!currentUser) {
       return { success: false, message: "Unauthorized" };
