@@ -68,9 +68,7 @@ export function AgentActions({ id }: { id: string }) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/agents/${id}`)}
-          >
+          <DropdownMenuItem onClick={() => router.push(`/admin/agent/${id}`)}>
             Edit
           </DropdownMenuItem>
 

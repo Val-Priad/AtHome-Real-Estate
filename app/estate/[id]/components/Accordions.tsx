@@ -27,7 +27,7 @@ export function Accordions({ estateData }: { estateData: EstateData }) {
       <AccordionSection
         title="Pricing & Costs"
         fields={[
-          ["Price", `${e.price} ₴)} (${e.priceUnit})`],
+          ["Price", `${e.price} ₴ (${e.priceUnit})`],
           ["Cost of Living", `${e.costOfLiving ?? "-"} ₴`],
           ["Commission", `${e.commission ?? "-"} ₴`],
           ["Commission Paid by Owner", e.commissionPaidByOwner ? "Yes" : "No"],

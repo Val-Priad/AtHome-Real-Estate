@@ -42,7 +42,6 @@ const EMPTY_VICINITY: CheckboxStateType["vicinity"] = {
   facilitiesNearby: [],
 };
 
-// Final payload type (exactly what server action expects)
 type SearchPayload = InputStateType &
   CheckboxStateType & {
     estateType: "apartment" | "house" | null;
@@ -114,7 +113,6 @@ export default function ResultsPage() {
     }
 
     const result: SearchPayload = {
-      aiSearch: temp.primitives.aiSearch,
       distanceToFacilities: temp.primitives.distanceToFacilities,
 
       usableAreaFrom: temp.numeric.usableAreaFrom,
@@ -150,7 +148,7 @@ export default function ResultsPage() {
       estateType: temp.estateType ?? null,
     };
     return result;
-  }, [params]); // ← Only depends on params!
+  }, [params]);
 
   useEffect(() => {
     async function load() {
@@ -198,14 +196,12 @@ export default function ResultsPage() {
           </p>
         )}
 
-        {/* When empty */}
         {!loading && totalItems === 0 && (
           <div className="py-10 text-center text-lg text-gray-500">
             No results match your filters.
           </div>
         )}
 
-        {/* Results */}
         {!loading && totalItems > 0 && (
           <>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -214,7 +210,6 @@ export default function ResultsPage() {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-8 flex items-center justify-center gap-4">
                 <button
