@@ -2,7 +2,7 @@ import { getEstateById } from "@/lib/actions/estate/getEstateById";
 import PhotoGallery from "./components/PhotoGallery";
 import EstateSubTitle from "./components/EstateSubTitle";
 import EstatePrice from "./components/EstatePrice";
-import WishlistButton from "./components/WishListButton";
+import AddToSavedButton from "./components/AddToSavedButton";
 import ShareButton from "./components/ShareButton";
 import EnergyLabel from "./components/EnergyLabel";
 import { formatDate } from "@/utils/formatDate";
@@ -35,7 +35,7 @@ export default async function Page({ params }: PageProps) {
             <div>
               <div className="space-x-3">
                 <EstatePrice estateData={data} />
-                <WishlistButton estateId={data.estate.id} />
+                <AddToSavedButton estateId={data.estate.id} />
                 <ShareButton />
               </div>
               <EnergyLabel energyLabel={data.estate.energyClass} />

@@ -8,12 +8,13 @@ import {
 } from "@/lib/actions/estate/savedEstate";
 import { useState, useEffect } from "react";
 import { IoBookmarks } from "react-icons/io5";
+import { toast } from "sonner";
 
 type WishlistButtonProps = {
   estateId: number;
 };
 
-export default function WishlistButton({ estateId }: WishlistButtonProps) {
+export default function AddToSavedButton({ estateId }: WishlistButtonProps) {
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +44,9 @@ export default function WishlistButton({ estateId }: WishlistButtonProps) {
         setSaved(true);
       }
     } catch (err) {
-      console.error(err);
+      if (err instanceof Error) {
+        toast.error(err.message);
+      }
     } finally {
       setLoading(false);
     }

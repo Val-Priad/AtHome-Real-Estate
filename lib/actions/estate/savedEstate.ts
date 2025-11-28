@@ -8,7 +8,7 @@ import { and, eq } from "drizzle-orm";
 export async function addToSaved(estateId: number) {
   const session = await auth();
   if (!session?.user?.id) {
-    throw new Error("Not authenticated");
+    throw new Error("Not authenticated, can't add to saved");
   }
 
   const exists = await isInSaved(estateId);
