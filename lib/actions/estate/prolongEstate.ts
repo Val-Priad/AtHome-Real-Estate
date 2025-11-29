@@ -6,7 +6,6 @@ import { eq } from "drizzle-orm";
 
 export async function prolongEstate(estateId: number, days: number) {
   try {
-    // Валидация входных данных
     if (!estateId || !days) {
       return { success: false, message: "Invalid parameters" };
     }
@@ -24,7 +23,6 @@ export async function prolongEstate(estateId: number, days: number) {
         .where(eq(estate.id, estateId))
         .returning({ id: estate.id });
 
-      // Проверяем, что запись реально обновилась
       if (result.length === 0) {
         return { success: false, message: "Estate not found" };
       }

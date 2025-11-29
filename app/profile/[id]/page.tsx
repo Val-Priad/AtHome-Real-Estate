@@ -53,7 +53,6 @@ export default async function AgentPage({
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
                 page={page}

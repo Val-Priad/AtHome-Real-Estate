@@ -36,7 +36,6 @@ const prolongOptions = ["7", "30", "90", "180", "365"];
 export function EstateActions({ id }: { id: number }) {
   const router = useRouter();
 
-  // ---------------------- PROLONG STATE ----------------------
   const [selectedProlongValue, setSelectedProlongValue] = useState<
     string | null
   >(null);
@@ -74,7 +73,6 @@ export function EstateActions({ id }: { id: number }) {
     }
   };
 
-  // ---------------------- DELETE STATE ----------------------
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -90,16 +88,10 @@ export function EstateActions({ id }: { id: number }) {
     }
   };
 
-  // ============================================================
-  //                        RENDER
-  // ============================================================
-
   return (
     <>
-      {/* Sonner Toaster */}
       <Toaster richColors position="top-center" />
 
-      {/* ---------------------- DROPDOWN MENU ---------------------- */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="mx-auto rounded p-1 hover:bg-gray-100">
@@ -123,7 +115,6 @@ export function EstateActions({ id }: { id: number }) {
           <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)}>
             Archive
           </DropdownMenuItem>
-          {/* ---------------------- PROLONG SUBMENU ---------------------- */}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Prolong</DropdownMenuSubTrigger>
 
@@ -133,7 +124,6 @@ export function EstateActions({ id }: { id: number }) {
                   key={days}
                   onClick={() => {
                     setSelectedProlongValue(days);
-                    // Даем dropdown закрыться
                     setTimeout(() => setProlongDialogOpen(true), 0);
                   }}
                 >
@@ -143,7 +133,6 @@ export function EstateActions({ id }: { id: number }) {
             </DropdownMenuSubContent>
           </DropdownMenuSub>
 
-          {/* ---------------------- DELETE TRIGGER ---------------------- */}
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => setDeleteDialogOpen(true)}
@@ -152,10 +141,6 @@ export function EstateActions({ id }: { id: number }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {/* ============================================================ */}
-      {/*                       PROLONG DIALOG                         */}
-      {/* ============================================================ */}
 
       <AlertDialog open={prolongDialogOpen} onOpenChange={setProlongDialogOpen}>
         <AlertDialogContent>
@@ -173,10 +158,6 @@ export function EstateActions({ id }: { id: number }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* ============================================================ */}
-      {/*                       DELETE DIALOG                          */}
-      {/* ============================================================ */}
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
