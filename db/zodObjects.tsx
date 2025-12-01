@@ -351,7 +351,7 @@ export type InsertFormType = z.infer<typeof InsertFormSchema>;
 
 export const authSchema = z.object({
   email: z.email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters").max(30),
 });
 
 export const authSchemaDefault = {
