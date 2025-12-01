@@ -22,7 +22,7 @@ function AgentSection({ estateData }: { estateData: EstateData }) {
   return (
     <>
       <div className="flex cursor-pointer gap-6">
-        <Link href={`/agent/${agent?.id}`}>
+        <Link href={`/profile/${agent?.id}`}>
           {agent?.image && (
             <Image
               src={agent?.image}
