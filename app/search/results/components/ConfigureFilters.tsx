@@ -44,10 +44,10 @@ export default function ConfigureFilters({
     !priceFrom && !priceTo
       ? "Any price"
       : priceFrom && priceTo
-        ? `${priceFrom} – ${priceTo} €`
+        ? `${priceFrom} – ${priceTo} ₴`
         : priceFrom
-          ? `From ${priceFrom} €`
-          : `Up to ${priceTo} €`;
+          ? `From ${priceFrom} ₴`
+          : `Up to ${priceTo} ₴`;
 
   return (
     <Link href={`/search?${queryString}`}>
