@@ -1629,6 +1629,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {heatingSourceEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1678,6 +1679,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {heatingElementEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1727,6 +1729,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {waterHeatSourceEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1776,6 +1779,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {waterEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1825,6 +1829,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {electricityEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1874,6 +1879,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {internetConnectionEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
@@ -1923,6 +1929,7 @@ function Page() {
                   <Field
                     orientation="horizontal"
                     data-invalid={fieldState.invalid}
+                    className="flex flex-wrap"
                   >
                     {telecommunicationEnum.enumValues.map((option) => {
                       const isChecked = value.includes(option);
