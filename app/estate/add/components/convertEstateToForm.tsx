@@ -16,7 +16,7 @@ export function convertEstateResponseToFormValues(server: any) {
   const multiselect = {
     estateHeatingSource: extract(ms.heatingSources, "heatingSource"),
     estateHeatingElement: extract(ms.heatingElements, "heatingElement"),
-    estateWaterHeatSource: extract(ms.waterHeating, "waterHeating"),
+    estateWaterHeatSource: extract(ms.waterHeating, "waterHeatSource"),
     estateWater: extract(ms.water, "water"),
     estateElectricity: extract(ms.electricity, "electricity"),
     estateTelecommunication: extract(ms.telecommunication, "telecommunication"),
@@ -43,14 +43,19 @@ export function convertEstateResponseToFormValues(server: any) {
   }));
 
   // Your schema: translations.title.ua, translations.title.en
+  // eslint-disable-next-line
+  const ua = translation.find((t: any) => t.langCode === "ua");
+  // eslint-disable-next-line
+  const en = translation.find((t: any) => t.langCode === "en");
+
   const translations = {
     title: {
-      ua: translation?.title || "",
-      en: translation?.title || "",
+      ua: ua?.title || "",
+      en: en?.title || "",
     },
     description: {
-      ua: translation?.description || "",
-      en: translation?.description || "",
+      ua: ua?.description || "",
+      en: en?.description || "",
     },
   };
 
