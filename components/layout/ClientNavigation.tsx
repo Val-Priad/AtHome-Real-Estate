@@ -98,7 +98,7 @@ export default function ClientNavigation({ user }: { user: User | null }) {
       </Sheet>
 
       {/* --- DESKTOP MENU --- */}
-      <ul className="text-body xl:text-h5 hidden list-none gap-7 font-bold md:flex 2xl:gap-20">
+      <ul className="text-h5 hidden list-none gap-7 font-bold md:flex 2xl:gap-20">
         {(user?.role === "admin" || user?.role === "agent") && (
           <li className="duration-300 hover:-translate-y-1">
             <Link href="/admin/estate">Admin</Link>
