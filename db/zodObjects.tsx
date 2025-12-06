@@ -62,7 +62,11 @@ export const estateSchema = z.object({
     .nonnegative("Must be not negative")
     .max(MAX_FOR_PRICE)
     .optional(),
-  commission: z.coerce.number().positive("Must be positive").optional(),
+  commission: z.coerce
+    .number()
+    .positive("Must be positive")
+    .max(MAX_FOR_PRICE)
+    .optional(),
   refundableDeposit: z.coerce
     .number()
     .nonnegative("Must be not negative")
