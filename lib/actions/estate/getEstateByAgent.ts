@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { estate, estateMedia } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, desc, asc } from "drizzle-orm";
 import { EstatePreview } from "./searchEstate";
 
 export async function getEstatesByAgentId(
@@ -17,21 +17,22 @@ export async function getEstatesByAgentId(
       price: estate.price,
       street: estate.street,
       city: estate.city,
-
-      image: sql<string | null>`
-        (
-          SELECT em.url
-          FROM ${estateMedia} em
-          WHERE em.estate_id = ${estate.id}
-          ORDER BY em.is_main DESC, em.id ASC
-          LIMIT 1
-        )
-      `,
+      image: estateMedia.url,
     })
     .from(estate)
-    .where(eq(estate.brokerId, agentId));
+    .leftJoin(estateMedia, eq(estateMedia.estateId, estate.id))
+    .where(eq(estate.brokerId, agentId))
+    .orderBy(desc(estateMedia.isMain), asc(estateMedia.id));
 
-  return rows.map((e) => ({
+  const unique = new Map<number, (typeof rows)[number]>();
+
+  for (const row of rows) {
+    if (!unique.has(row.id)) {
+      unique.set(row.id, row);
+    }
+  }
+
+  return Array.from(unique.values()).map((e) => ({
     id: e.id,
     property_type: e.category,
     usable_area: e.usableArea,

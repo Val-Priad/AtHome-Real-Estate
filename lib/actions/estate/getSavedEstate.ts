@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { savedEstate, estate, estateMedia } from "@/db/schema";
-import { eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, desc, asc } from "drizzle-orm";
 import { auth } from "@/auth";
 
 export async function getSavedEstate() {
@@ -22,7 +22,7 @@ export async function getSavedEstate() {
 
     if (ids.length === 0) return [];
 
-    const estates = await db
+    const rows = await db
       .select({
         id: estate.id,
         category: estate.category,
@@ -31,21 +31,22 @@ export async function getSavedEstate() {
         price: estate.price,
         street: estate.street,
         city: estate.city,
-
-        image: sql<string | null>`
-          (
-            SELECT em.url 
-            FROM ${estateMedia} em
-            WHERE em.estate_id = ${estate.id}
-            ORDER BY em.is_main DESC, em.id ASC
-            LIMIT 1
-          )
-        `,
+        image: estateMedia.url,
       })
       .from(estate)
-      .where(inArray(estate.id, ids as readonly number[]));
+      .leftJoin(estateMedia, eq(estateMedia.estateId, estate.id))
+      .where(inArray(estate.id, ids as readonly number[]))
+      .orderBy(desc(estateMedia.isMain), asc(estateMedia.id));
 
-    return estates.map((e) => ({
+    const unique = new Map<number, (typeof rows)[number]>();
+
+    for (const row of rows) {
+      if (!unique.has(row.id)) {
+        unique.set(row.id, row);
+      }
+    }
+
+    return Array.from(unique.values()).map((e) => ({
       id: e.id,
       property_type: e.category,
       usable_area: e.usableArea,
