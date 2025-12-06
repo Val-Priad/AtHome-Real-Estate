@@ -48,7 +48,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="bg-background w-64 rounded-2xl border-r">
+    <aside className="bg-background mb-6 w-64 rounded-2xl sm:mb-0 sm:border-r">
       <div className="p-6">
         <h2 className="text-xl font-bold">Admin Panel</h2>
       </div>

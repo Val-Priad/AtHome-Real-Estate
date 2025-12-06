@@ -58,7 +58,7 @@ export function DataTable<T>({ columns, data }: DataTableProps<T>) {
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-scroll">
       <div className="flex justify-between">
         <Input
           placeholder="Search..."

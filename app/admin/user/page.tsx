@@ -17,7 +17,7 @@ export default async function UsersPage() {
   const users = result.data as UserRow[];
 
   return (
-    <div className="flex pt-10">
+    <div className="flex flex-col gap-2 pt-10 sm:flex-row sm:gap-0">
       <Sidebar />
 
       <main className="w-full px-10">
