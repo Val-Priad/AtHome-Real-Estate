@@ -111,8 +111,8 @@ export const columns: ColumnDef<EstateRow>[] = [
   },
 
   {
-    accessorKey: "broker",
-    header: "Broker",
+    accessorKey: "agentName",
+    header: "Agent",
     sortingFn: "alphanumeric",
   },
 
