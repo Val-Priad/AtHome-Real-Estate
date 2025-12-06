@@ -1,5 +1,5 @@
 "use server";
-import { VicinityType, vicinityTypeEnum } from "@/db/schema";
+import { VicinityType } from "@/db/schema";
 import { groupPlaces } from "@/utils/groupPlaces";
 import { haversineDistance } from "@/utils/haversineDistance";
 
