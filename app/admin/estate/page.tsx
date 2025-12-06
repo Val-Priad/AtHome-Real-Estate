@@ -16,6 +16,7 @@ export default async function EstatesPage() {
   if (!data) {
     return <div className="p-10 text-red-600">Failed to load data</div>;
   }
+  console.log(data);
 
   const filteredData = isAgent
     ? data.filter((estate) => estate.agentId === user.id)
