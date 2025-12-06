@@ -19,7 +19,7 @@ function AccordionSection({
         {title}
         <IoTriangle className="text-brand-6 transition-transform duration-300 group-data-[state=closed]:rotate-180" />
       </AccordionTrigger>
-      <AccordionContent className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      <AccordionContent className="grid grid-cols-1 gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
         {fields.map(([label, value]) => (
           <Field key={label} label={label} value={value} />
         ))}

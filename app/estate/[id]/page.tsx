@@ -29,7 +29,7 @@ export default async function Page({ params }: PageProps) {
     <main>
       <PhotoGallery photos={data.media} />
       <div className="flex justify-center">
-        <div className="max-w-[1000px] space-y-8 rounded-3xl bg-red-50 p-8">
+        <div className="w-full max-w-[1000px] space-y-8 rounded-3xl bg-red-50 p-8">
           <div className="space-y-2">
             <EstateSubTitle estateData={data} />
             <div>
