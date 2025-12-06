@@ -58,7 +58,7 @@ export async function getEstateTable() {
       usableArea: row.usableArea,
       region: row.region,
 
-      agentName: row.agentName ? `${row.agentName}` : "No broker",
+      agentName: row.agentName ? `${row.agentName}` : "No agent",
       agentId: row.agentId,
 
       createdAt: row.createdAt,
