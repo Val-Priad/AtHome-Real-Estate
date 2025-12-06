@@ -15,6 +15,7 @@ import {
   estateVicinity,
   estateMedia,
   vicinityTypeEnum,
+  estateWaterHeating,
 } from "@/db/schema";
 
 import { InsertFormSchema } from "@/db/zodObjects";
@@ -115,6 +116,7 @@ export async function updateEstate(
       }
 
       const multiselectMap = [
+        ["estateWaterHeatSource", estateWaterHeating, "waterHeatSource"],
         ["estateHeatingSource", estateHeatingSource, "heatingSource"],
         ["estateElectricity", estateElectricity, "electricity"],
         ["estateHeatingElement", estateHeatingElement, "heatingElement"],
