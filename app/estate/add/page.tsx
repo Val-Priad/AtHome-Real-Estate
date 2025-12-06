@@ -63,10 +63,10 @@ import { getS3PresignedUrl } from "@/lib/actions/getS3PresignedUrl";
 import { getAllAgents } from "@/lib/actions/user/getAllAgents";
 import VicinityTabs from "@/components/Elements/VicinityTabs";
 import { redirect, useSearchParams } from "next/navigation";
-import { getEstateById } from "@/lib/actions/estate/getEstateById";
 import { convertEstateResponseToFormValues } from "./components/convertEstateToForm";
 import { getCurrentUser } from "@/lib/actions/user/getCurrentUser";
 import { updateEstate } from "@/lib/actions/estate/updateEstate";
+import { getEstateWholeDataById } from "@/lib/actions/estate/getEstateWholeDataById";
 
 const ReadyDatePicker = dynamic(() => import("./components/DatePicker"), {
   ssr: false,
@@ -100,11 +100,14 @@ function Page() {
       if (user?.role === "user") {
         redirect("/not-found");
       }
-      const data = await getEstateById(Number(estateId));
+      try {
+        const data = await getEstateWholeDataById(Number(estateId));
 
-      const formValues = convertEstateResponseToFormValues(data);
-
-      form.reset(formValues);
+        const formValues = convertEstateResponseToFormValues(data);
+        form.reset(formValues);
+      } catch {
+        redirect("/not-found");
+      }
     }
 
     loadEstate();
