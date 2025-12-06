@@ -4,8 +4,10 @@ import { FaBuilding } from "react-icons/fa";
 import { FaHouseChimney } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import styles from "@/styles/page.module.css";
+import { getOffersCount } from "@/lib/actions/estate/getOffersCount";
 
-export default function Page() {
+export default async function Page() {
+  const offers = await getOffersCount();
   return (
     <main className={`${styles["bg-home"]} flex items-center justify-center`}>
       <div className="flex w-50 flex-col sm:w-60 lg:w-66 xl:w-80 2xl:w-100">
@@ -17,9 +19,11 @@ export default function Page() {
             height={404}
             className="h-auto w-full"
           />
-          <p className="text-body 2xl:text-h5 text-brand-10 text-center">
-            Choose from 99,186 real estate offers
-          </p>
+          {offers && (
+            <p className="text-body 2xl:text-h5 text-brand-10 text-center">
+              Choose from {offers} real estate offers
+            </p>
+          )}
         </div>
         <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-6 md:gap-8 2xl:gap-10">
           <Link href={`/search?estateType=apartment`}>
