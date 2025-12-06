@@ -58,14 +58,14 @@ export default function PhotoGallery({ photos }: Props) {
 
   const renderCustomLayout = () => {
     const count = sorted.length;
-
     const firstFive = sorted.slice(0, 5);
 
+    // ---------- ONE ----------
     if (count === 1) {
       return (
         <div className="mx-auto max-w-[900px] p-4">
           <div
-            className="relative h-[500px] w-full cursor-pointer overflow-hidden rounded-lg"
+            className="relative h-[300px] w-full cursor-pointer overflow-hidden rounded-lg sm:h-[400px] md:h-[500px]"
             onClick={() => openModal(0)}
           >
             <Image
@@ -79,13 +79,14 @@ export default function PhotoGallery({ photos }: Props) {
       );
     }
 
+    // ---------- TWO ----------
     if (count === 2) {
       return (
-        <div className="mx-auto grid max-w-[1000px] grid-cols-2 gap-3 p-4">
+        <div className="mx-auto grid max-w-[1000px] grid-cols-1 gap-3 p-4 sm:grid-cols-2">
           {sorted.map((p, i) => (
             <div
               key={p.id}
-              className="relative h-[350px] cursor-pointer overflow-hidden rounded-lg"
+              className="relative h-[250px] cursor-pointer overflow-hidden rounded-lg sm:h-[300px] md:h-[350px]"
               onClick={() => openModal(i)}
             >
               <Image
@@ -100,11 +101,12 @@ export default function PhotoGallery({ photos }: Props) {
       );
     }
 
+    // ---------- THREE ----------
     if (count === 3) {
       return (
-        <div className="mx-auto grid max-w-[1200px] grid-cols-3 grid-rows-2 gap-3 p-4">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-3 p-4 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2">
           <div
-            className="relative col-span-2 row-span-2 cursor-pointer overflow-hidden rounded-lg"
+            className="relative h-[250px] cursor-pointer overflow-hidden rounded-lg sm:h-[300px] md:col-span-2 md:row-span-2 md:h-full"
             onClick={() => openModal(0)}
           >
             <Image
@@ -118,7 +120,7 @@ export default function PhotoGallery({ photos }: Props) {
           {sorted.slice(1, 3).map((p, i) => (
             <div
               key={p.id}
-              className="relative h-[250px] cursor-pointer overflow-hidden rounded-lg"
+              className="relative h-[200px] cursor-pointer overflow-hidden rounded-lg sm:h-[250px] md:h-[250px]"
               onClick={() => openModal(i + 1)}
             >
               <Image
@@ -133,11 +135,12 @@ export default function PhotoGallery({ photos }: Props) {
       );
     }
 
+    // ---------- FOUR ----------
     if (count === 4) {
       return (
-        <div className="mx-auto grid max-w-[1200px] grid-cols-4 grid-rows-2 gap-3 p-4">
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-3 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:grid-rows-2">
           <div
-            className="relative col-span-2 row-span-2 cursor-pointer overflow-hidden rounded-lg"
+            className="relative h-[250px] cursor-pointer overflow-hidden rounded-lg sm:h-[300px] md:h-full lg:col-span-2 lg:row-span-2"
             onClick={() => openModal(0)}
           >
             <Image
@@ -151,7 +154,7 @@ export default function PhotoGallery({ photos }: Props) {
           {sorted.slice(1, 4).map((p, i) => (
             <div
               key={p.id}
-              className="relative h-[250px] cursor-pointer overflow-hidden rounded-lg"
+              className="relative h-[200px] cursor-pointer overflow-hidden rounded-lg sm:h-[250px] md:h-[250px]"
               onClick={() => openModal(i + 1)}
             >
               <Image
@@ -166,24 +169,25 @@ export default function PhotoGallery({ photos }: Props) {
       );
     }
 
+    // ---------- FIVE OR MORE ----------
     if (count >= 5) {
       return (
-        <div className="mx-auto grid max-w-[1400px] grid-cols-10 grid-rows-[repeat(3,200px)] gap-2 p-4">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-2 p-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-10 lg:grid-rows-[repeat(3,200px)]">
           {firstFive.map((p, index) => (
             <div
               key={p.id}
               onClick={() => openModal(sorted.indexOf(p))}
               className={[
-                "relative cursor-pointer overflow-hidden rounded-lg bg-gray-300",
+                "relative min-h-[200px] cursor-pointer overflow-hidden rounded-lg bg-gray-300",
                 index === 0
-                  ? "col-span-4 row-span-3"
+                  ? "lg:col-span-4 lg:row-span-3"
                   : index === 1
-                    ? "col-start-5 col-end-8 row-span-2"
+                    ? "lg:col-start-5 lg:col-end-8 lg:row-span-2"
                     : index === 2
-                      ? "col-start-5 col-end-8 row-start-3"
+                      ? "lg:col-start-5 lg:col-end-8 lg:row-start-3"
                       : index === 3
-                        ? "col-start-8 col-end-11"
-                        : "col-start-8 col-end-11 row-span-2 row-start-2",
+                        ? "lg:col-start-8 lg:col-end-11"
+                        : "lg:col-start-8 lg:col-end-11 lg:row-span-2 lg:row-start-2",
               ].join(" ")}
             >
               <Image
@@ -193,7 +197,6 @@ export default function PhotoGallery({ photos }: Props) {
                 className="object-cover"
               />
 
-              {/* overlay для "ещё n фото" */}
               {count > 5 && index === 4 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-3xl font-semibold text-white backdrop-blur-sm">
                   +{count - 5}
@@ -209,6 +212,7 @@ export default function PhotoGallery({ photos }: Props) {
   return (
     <>
       {renderCustomLayout()}
+
       {currentIndex !== null && (
         <div
           className={`${styles.animateFadeIn} fixed inset-0 z-50 flex items-center justify-center bg-black/90`}
