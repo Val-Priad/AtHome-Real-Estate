@@ -19,7 +19,7 @@ export default async function Page() {
             height={404}
             className="h-auto w-full"
           />
-          {offers && (
+          {!!offers && (
             <p className="text-body 2xl:text-h5 text-brand-10 text-center">
               Choose from {offers} real estate offers
             </p>
