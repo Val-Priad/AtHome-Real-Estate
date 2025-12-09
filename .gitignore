@@ -46,3 +46,8 @@ DB_Related/Thoughts 2.md
 app/actions/bus_stops.ts
 db/scheme.sql
 db/Thoughts.md
+
+AI
+DEMONSTRATION.MD
+*.dump
+
